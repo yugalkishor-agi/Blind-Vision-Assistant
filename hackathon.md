@@ -304,6 +304,14 @@
 - **Tests Run**: Bootstrap lifecycle, keyboard shortcut binding, and settings transition verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 37 — Error Recovery Page with Screen Reader Guidance)
+- **Status**: Completed
+- **Summary**: Implemented `ErrorRecoveryPage` displaying plain-language TTS-friendly failure explanations and a re-download action.
+- **Completed Work**: Created `lib/error_recovery_page.dart` (43 lines). Replaces complex stack traces with concise guidance readable by screen readers, providing a single `Semantics`-labeled retry button that pops navigation back to the download route. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement `SettingsPage`.
+- **Tests Run**: Navigation popUntil behavior and TTS error text readability verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
