@@ -121,6 +121,14 @@
 - **Tests Run**: Regex sentence-boundary trigger verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 14 — Acoustic Dictation & Voice Speech Service)
+- **Status**: Completed
+- **Summary**: Implemented SpeechService coordinating speech recognition, TTS feedback, and earcon sound cues.
+- **Completed Work**: Created `lib/chat_page/services/speech_service.dart` (88 lines) integrating `SpeechToText`, `FlutterTts`, `SoundManager`, and prompt bar text binding with F2 shortcut listener. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement tactile KeyboardHandler for hardware accessibility shortcuts.
+- **Tests Run**: Speech recognition state machine & dictation sound synchronization verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
