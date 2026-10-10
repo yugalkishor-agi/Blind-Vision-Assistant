@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JZFA9N4F634VA7SCECB5A9",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T13:19:10.5378447Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "lib/chat_page/services/speech_service.dart"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "4348d5de0fe2",
+  "checkpoint_transcript_start": 410,
+  "transcript_lines_at_start": 410,
+  "token_usage": {
+    "input_tokens": 17106,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 9484103,
+    "output_tokens": 8659,
+    "api_call_count": 42
+  },
+  "session_metrics": {
+    "turn_count": 16
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T13:19:10.497091Z",
+    "agent_lines": 91,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 91,
+    "total_lines_changed": 91,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

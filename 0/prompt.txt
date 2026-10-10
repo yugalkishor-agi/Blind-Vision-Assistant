@@ -1,0 +1,191 @@
+Now create 2 more files together — the speech service and the keyboard handler.
+
+  File 1: lib/chat_page/services/speech_service.dart
+
+  Responsibilities: Manages microphone dictation using speech_to_text package. Also handles TTS via flutter_tts. Key methods:
+  - initialize() — init speech recognition
+  - toggleDictation() — start/stop mic, play dictation sounds, fill prompt bar with recognized text
+  - handleFocusKey() — keyboard event handler for F1/F2 shortcuts
+  - speak(String text) — direct TTS
+  - stopTts() — stop speaking
+  - announceMessageType(bool hasImage) — announce "photo message" or "text message"
+  - playWooshSound() — delegates to SoundManager
+  - State: speechEnabled, listening booleans
+
+  import 'dart:async';
+  import 'package:flutter/services.dart';
+  import 'package:flutter/widgets.dart';
+  import 'package:flutter_tts/flutter_tts.dart';
+  import 'package:speech_to_text/speech_to_text.dart';
+  import '../widgets/prompt_bar.dart';
+  import 'sound_manager.dart';
+
+  class SpeechService {
+    final FlutterTts _tts;
+    final SpeechToText _stt = SpeechToText();
+    final SoundManager _sounds = SoundManager();
+    final GlobalKey<PromptBarState> _promptBarKey;
+    final VoidCallback _onStateChanged;
+    Function() _isGenerating;
+
+    bool speechEnabled = false;
+    bool listening = false;
+
+    SpeechService({
+      required FlutterTts tts,
+      required VoidCallback onStateChanged,
+      required GlobalKey<PromptBarState> promptBarKey,
+      required Function() isGenerating,
+    })  : _tts = tts,
+          _onStateChanged = onStateChanged,
+          _promptBarKey = promptBarKey,
+          _isGenerating = isGenerating;
+
+    void updateIsGeneratingCallback(Function() cb) => _isGenerating = cb;
+
+    Future<void> initialize() async {
+      speechEnabled = await _stt.initialize();
+      _onStateChanged();
+    }
+
+    Future<void> speak(String text) async {
+      await _tts.speak(text);
+    }
+
+    Future<void> stopTts() async {
+      await _tts.stop();
+    }
+
+    Future<void> playWooshSound() async {
+      await _sounds.playWoosh();
+    }
+
+    Future<void> announceMessageType(bool hasImage) async {
+      await _tts.speak(hasImage ? 'Photo message' : 'Text message');
+    }
+
+    Future<void> toggleDictation() async {
+      if (!speechEnabled) return;
+      if (listening) {
+        await _stt.stop();
+        await _sounds.playDictationStop();
+        listening = false;
+        _onStateChanged();
+      } else {
+        await _sounds.playDictationStart();
+        listening = true;
+        _onStateChanged();
+        await _stt.listen(
+          onResult: (result) {
+            if (result.finalResult) {
+              _promptBarKey.currentState?.setText(result.recognizedWords);
+              listening = false;
+              _onStateChanged();
+            }
+          },
+          cancelOnError: true,
+        );
+      }
+    }
+
+    KeyEventResult handleFocusKey(FocusNode node, KeyEvent event) {
+      if (event is KeyDownEvent) {
+        if (event.logicalKey == LogicalKeyboardKey.f2) {
+          toggleDictation();
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    }
+
+    void dispose() {
+      _stt.cancel();
+      _sounds.dispose();
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 2: lib/chat_page/handlers/keyboard_handler.dart
+
+  Responsibilities: Maps keyboard shortcuts to app actions using Flutter Shortcuts + Actions system. Shortcuts:
+  - F1 → toggle messages
+  - F2 → toggle voice
+  - F3 → new chat
+  - F4 → settings
+  - F5 → quick action 1 (describe room)
+  - F6 → quick action 2 (what do you see)
+  - F7 → quick action 3 (what is this)
+  - F8 → quick action 4 (read text)
+
+  import 'package:flutter/material.dart';
+  import 'package:flutter/services.dart';
+  import '../widgets/prompt_bar.dart';
+
+  class _ActionIntent extends Intent {
+    const _ActionIntent(this.key);
+    final LogicalKeyboardKey key;
+  }
+
+  class KeyboardHandler {
+    final BuildContext context;
+    final GlobalKey<PromptBarState> promptBarKey;
+    final VoidCallback onToggleMessages;
+    final VoidCallback onToggleCamera;
+    final VoidCallback onToggleSettings;
+    final Future<void> Function() onNewChat;
+    final Future<void> Function() onQuickAction1;
+    final Future<void> Function() onQuickAction2;
+    final Future<void> Function() onQuickAction3;
+    final Future<void> Function() onQuickAction4;
+    final VoidCallback onToggleVoice;
+
+    KeyboardHandler({
+      required this.context,
+      required this.promptBarKey,
+      required this.onToggleMessages,
+      required this.onToggleCamera,
+      required this.onToggleSettings,
+      required this.onNewChat,
+      required this.onQuickAction1,
+      required this.onQuickAction2,
+      required this.onQuickAction3,
+      required this.onQuickAction4,
+      required this.onToggleVoice,
+    });
+
+    Map<ShortcutActivator, Intent> get shortcuts => {
+      SingleActivator(LogicalKeyboardKey.f1): const _ActionIntent(LogicalKeyboardKey.f1),
+      SingleActivator(LogicalKeyboardKey.f2): const _ActionIntent(LogicalKeyboardKey.f2),
+      SingleActivator(LogicalKeyboardKey.f3): const _ActionIntent(LogicalKeyboardKey.f3),
+      SingleActivator(LogicalKeyboardKey.f4): const _ActionIntent(LogicalKeyboardKey.f4),
+      SingleActivator(LogicalKeyboardKey.f5): const _ActionIntent(LogicalKeyboardKey.f5),
+      SingleActivator(LogicalKeyboardKey.f6): const _ActionIntent(LogicalKeyboardKey.f6),
+      SingleActivator(LogicalKeyboardKey.f7): const _ActionIntent(LogicalKeyboardKey.f7),
+      SingleActivator(LogicalKeyboardKey.f8): const _ActionIntent(LogicalKeyboardKey.f8),
+    };
+
+    Map<Type, Action<Intent>> get actions => {
+      _ActionIntent: CallbackAction<_ActionIntent>(
+        onInvoke: (intent) {
+          if (intent.key == LogicalKeyboardKey.f1) onToggleMessages();
+          if (intent.key == LogicalKeyboardKey.f2) onToggleVoice();
+          if (intent.key == LogicalKeyboardKey.f3) onNewChat();
+          if (intent.key == LogicalKeyboardKey.f4) onToggleSettings();
+          if (intent.key == LogicalKeyboardKey.f5) onQuickAction1();
+          if (intent.key == LogicalKeyboardKey.f6) onQuickAction2();
+          if (intent.key == LogicalKeyboardKey.f7) onQuickAction3();
+          if (intent.key == LogicalKeyboardKey.f8) onQuickAction4();
+          return null;
+        },
+      ),
+    };
+  }
+
+  Create both files at their exact paths. Think about why keyboard shortcuts matter for a blind user app, and why speech service needs to
+  coordinate sound cues with dictation state.
+
+  Neatlogs instruction: Log only the accessibility reasoning for each file — why F-key shortcuts, why dictation state machine, why sound cues
+  coordinate with speech. No raw source code.
+
+  After both files, do 2 commits each (feat + docs) and log to neatlogs.
