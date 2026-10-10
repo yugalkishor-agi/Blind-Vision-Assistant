@@ -312,6 +312,14 @@
 - **Tests Run**: Navigation popUntil behavior and TTS error text readability verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 38 — Settings Page for System Prompt and Hardware Backend Selection)
+- **Status**: Completed
+- **Summary**: Implemented `SettingsPage` with prompt editor, default reset button, and PreferredBackend CPU/GPU switcher.
+- **Completed Work**: Created `lib/settings_page.dart` (86 lines). Provides accessible `TextField` for editing system prompts, `RadioListTile` controls for switching inference execution backends, and returns configurations via `Navigator.pop` map payload. Pushed to GitHub with Entire sync.
+- **Planned Work**: Integration testing and end-to-end accessibility walkthrough.
+- **Tests Run**: Prompt text persistence, reset action, and backend selection verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
