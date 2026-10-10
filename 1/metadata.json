@@ -1,0 +1,133 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JWRKH8520W1XPS591VA9S9",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T12:31:50.6090345Z",
+  "branch": "main",
+  "checkpoints_count": 7,
+  "save_step_count": 2,
+  "files_touched": [
+    ".gitignore",
+    "skills/neathacklogskill.txt"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "c9a6e4d98cbd",
+  "token_usage": {
+    "input_tokens": 178339,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 8261160,
+    "output_tokens": 21887,
+    "api_call_count": 79
+  },
+  "session_metrics": {
+    "turn_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T12:31:50.5663108Z",
+    "agent_lines": 1,
+    "agent_removed": 0,
+    "human_added": 66,
+    "human_modified": 54,
+    "human_removed": 0,
+    "total_committed": 82,
+    "total_lines_changed": 121,
+    "agent_percentage": 0.8264462809917356,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 42,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".gitignore": 4,
+        "skills/neathacklogskill.txt": 38
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 1316,
+      "user_lines_removed": 0,
+      "agent_lines_added": 103,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".dart_tool/package_config.json": 178,
+        ".dart_tool/package_graph.json": 230,
+        ".dart_tool/version": 1,
+        ".idea/libraries/Dart_SDK.xml": 19,
+        ".idea/libraries/KotlinJavaRuntime.xml": 15,
+        ".idea/modules.xml": 9,
+        ".idea/runConfigurations/main_dart.xml": 6,
+        ".idea/workspace.xml": 36,
+        ".metadata": 30,
+        "README.md": 16,
+        "analysis_options.yaml": 28,
+        "android/.gitignore": 14,
+        "android/app/build.gradle.kts": 44,
+        "android/app/src/debug/AndroidManifest.xml": 7,
+        "android/app/src/main/AndroidManifest.xml": 45,
+        "android/app/src/main/kotlin/com/hackathon/blind_vision_assistant/MainActivity.kt": 5,
+        "android/app/src/main/res/drawable-v21/launch_background.xml": 12,
+        "android/app/src/main/res/drawable/launch_background.xml": 12,
+        "android/app/src/main/res/values-night/styles.xml": 18,
+        "android/app/src/main/res/values/styles.xml": 18,
+        "android/app/src/profile/AndroidManifest.xml": 7,
+        "android/blind_vision_assistant_android.iml": 29,
+        "android/build.gradle.kts": 24,
+        "android/gradle.properties": 3,
+        "android/gradle/wrapper/gradle-wrapper.properties": 5,
+        "android/settings.gradle.kts": 26,
+        "blind_vision_assistant.iml": 17,
+        "hackathon.md": 8,
+        "lib/main.dart": 122,
+        "pubspec.lock": 213,
+        "pubspec.yaml": 89,
+        "test/widget_test.dart": 30
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 1308,
+      "user_lines_removed": 0,
+      "agent_lines_added": 119,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".dart_tool/package_config.json": 178,
+        ".dart_tool/package_graph.json": 230,
+        ".dart_tool/version": 1,
+        ".idea/libraries/Dart_SDK.xml": 19,
+        ".idea/libraries/KotlinJavaRuntime.xml": 15,
+        ".idea/modules.xml": 9,
+        ".idea/runConfigurations/main_dart.xml": 6,
+        ".idea/workspace.xml": 36,
+        ".metadata": 30,
+        "README.md": 16,
+        "analysis_options.yaml": 28,
+        "android/.gitignore": 14,
+        "android/app/build.gradle.kts": 44,
+        "android/app/src/debug/AndroidManifest.xml": 7,
+        "android/app/src/main/AndroidManifest.xml": 45,
+        "android/app/src/main/kotlin/com/hackathon/blind_vision_assistant/MainActivity.kt": 5,
+        "android/app/src/main/res/drawable-v21/launch_background.xml": 12,
+        "android/app/src/main/res/drawable/launch_background.xml": 12,
+        "android/app/src/main/res/values-night/styles.xml": 18,
+        "android/app/src/main/res/values/styles.xml": 18,
+        "android/app/src/profile/AndroidManifest.xml": 7,
+        "android/blind_vision_assistant_android.iml": 29,
+        "android/build.gradle.kts": 24,
+        "android/gradle.properties": 3,
+        "android/gradle/wrapper/gradle-wrapper.properties": 5,
+        "android/settings.gradle.kts": 26,
+        "blind_vision_assistant.iml": 17,
+        "lib/main.dart": 122,
+        "pubspec.lock": 213,
+        "pubspec.yaml": 89,
+        "test/widget_test.dart": 30
+      }
+    }
+  ]
+}
