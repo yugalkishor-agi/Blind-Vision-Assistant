@@ -5,7 +5,7 @@ import '../models/message_models.dart';
 
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
-  const ChatBubble({Key? key, required this.message}) : super(key: key);
+  const ChatBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class ChatBubble extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(
-                '${message.stats!.tokenCount ?? 0} tokens · ${(message.stats!.totalLatency ?? 0).toStringAsFixed(1)}s',
+                '${message.stats!.tokenCount} tokens · ${message.stats!.totalLatency.toStringAsFixed(1)}s',
                 style: const TextStyle(fontSize: 10, color: Colors.grey),
               ),
             ),
