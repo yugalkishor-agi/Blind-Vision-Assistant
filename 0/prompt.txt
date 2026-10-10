@@ -1,0 +1,141 @@
+t their exact paths. For each file, think about why this design makes sense for a blind user app — what problem does it
+
+---
+
+solve.
+
+  Neatlogs instruction: For each file, log only the design reasoning — why singleton for OCR, why sentence-boundary TTS streaming, why silent
+error handling in audio. No raw source code in any trace.
+
+  After all 3 files are created, do 2 commits pe:audioplayers/audioplayers.dart';
+class SoundManager {
+    final AudioPlayer _player = AudioPlayer();
+
+    Future<void> playWoosh() async {
+      try {
+        await _player.play(AssetSource('woosh.mp3'));
+      } catch (_) {}
+    }
+
+    Future<void> playDictationStart() async {
+try {
+        await _player.play(AssetSource('dictation_start.mp3'));
+      } catch (_) {}
+    }
+
+    Future<void> playDictationStop() async {
+      try {
+        await _player.play(AssetSource('dictation_stop.mp3'));
+} catch (_) {}
+    }
+
+    Future<void> dispose() async {
+      await _player.dispose();
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+File 2: lib/chat_page/services/text_recognition_service.dart
+
+  Responsibilities: Singleton OCR service using google_mlkit_text_recognition. Method extractTextFromImage(File?) returns extracted text
+  string. Initialize once, dispose properly.
+
+  import 'dart:io';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+
+  class TextRecognitionService {
+    TextRecognitionService._internal();
+    static final TextRecognitionService instance = TextRecognitionService._internal();
+late final TextRecognizer _recognizer;
+    bool _initialized = false;
+
+    Future<void> initialize() async {
+      if (_initialized) return;
+      _recognizer = TextRecognizer(script: TextRecognitionScript.latin);
+      _initialized = true;
+    }
+
+    Future<String> extractTextFromImage(File? imageFile) async {
+if (!_initialized || imageFile == null) return '';
+      try {
+        final inputImage = InputImage.fromFile(imageFile);
+        final result = await _recognizer.processImage(inputImage);
+        return result.text;
+      } catch (_) {
+        return '';
+}
+    }
+
+    Future<void> dispose() async {
+      if (_initialized) {
+        await _recognizer.close();
+        _initialized = false;
+      }
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 3: lib/chat_page/services/streaming_tts_service.dart
+Responsibilities: Streams AI tokens to TTS in real-time as they arrive. Uses flutter_tts. Tracks speaking state via ValueNotifier<bool>.
+  Methods: addText(), startLoading(), stopLoading(), onMessageComplete(), reset(), stop().
+
+  import 'package:flutter/foundation.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+
+  class StreamingTtsService {
+    final FlutterTts _tts;
+    final ValueNotifier<bool> isSpeaking = ValueNotifier(false);
+    final StringBuffer _buffer = StringBuffer();
+    bool _loading = false;
+StreamingTtsService(this._tts);
+
+    Future<void> startLoading() async {
+      _loading = true;
+      isSpeaking.value = true;
+    }
+Future<void> stopLoading() async {
+      _loading = false;
+      isSpeaking.value = false;
+    }
+
+    void addText(String token, String fullText) {
+_buffer.write(token);
+      if (token.contains(RegExp(r'[.!?]'))) {
+        _speakBuffer();
+      }
+    }
+
+    void _speakBuffer() {
+      final text = _buffer.toString().trim();
+      if (text.isNotEmpty) {
+_tts.speak(text);
+        _buffer.clear();
+      }
+    }
+
+    Future<void> onMessageComplete() async {
+      _speakBuffer();
+      _loading = false;
+    }
+
+    void reset() {
+      _buffer.clear();
+      _tts.stop();
+      isSpeaking.value = false;
+    }
+
+    void stop() {
+      reset();
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Create all 3 files at their exact paths. For each file, think about why this design makes sense for a blind user app — what problem does it
+  solve.
+
+  Neatlogs instruction: For each file, log only the design reasoning — why singleton for OCR, why sentence-boundary TTS streaming, why silent
+error handling in audio. No raw source code in any trace.
+
+  After all 3 files are created, do 2 commits per file (feat + docs) and log to neatlogs.
