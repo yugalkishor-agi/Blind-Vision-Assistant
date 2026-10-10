@@ -3,7 +3,7 @@
   "checkpoint_id": "01M4JWW4TN27FCM6K20SG7SE6S",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 3,
+  "checkpoints_count": 10,
   "files_touched": [
     "analysis_options.yaml",
     "pubspec.lock",
@@ -14,6 +14,12 @@
       "metadata": "/0/metadata.json",
       "transcript": "/0/full.jsonl",
       "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "content_hash": "/1/content_hash.txt",
       "prompt": ""
     }
   ]
