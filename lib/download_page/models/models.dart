@@ -1,43 +1,73 @@
-import 'enums.dart';
+// download_page/models/models.dart
+import 'package:flutter_downloader/flutter_downloader.dart';
 
-class DownloadState {
-  final DownloadStatus status;
-  final int progress;
-  final String? taskId;
-  final String? errorMessage;
+// OAuth token data with expiry validation
+class AuthTokenData {
+  final String accessToken;
+  final String? refreshToken;
+  final DateTime expiryTime;
 
-  const DownloadState({
-    this.status = DownloadStatus.notStarted,
-    this.progress = 0,
-    this.taskId,
-    this.errorMessage,
+  AuthTokenData({
+    required this.accessToken,
+    this.refreshToken,
+    required this.expiryTime,
   });
 
-  DownloadState copyWith({
-    DownloadStatus? status,
-    int? progress,
-    String? taskId,
-    String? errorMessage,
-  }) {
-    return DownloadState(
-      status: status ?? this.status,
-      progress: progress ?? this.progress,
-      taskId: taskId ?? this.taskId,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
+  // Check if token has expired (compares with current time)
+  bool get isExpired => DateTime.now().isAfter(expiryTime);
+
+  Map<String, dynamic> toJson() => {
+    'accessToken': accessToken,
+    'refreshToken': refreshToken,
+    'expiryTime': expiryTime.toIso8601String(),
+  };
+
+  factory AuthTokenData.fromJson(Map<String, dynamic> json) => AuthTokenData(
+    accessToken: json['accessToken'],
+    refreshToken: json['refreshToken'],
+    expiryTime: DateTime.parse(json['expiryTime']),
+  );
 }
 
-class HuggingFaceToken {
-  final String accessToken;
-  final String tokenType;
+// Download progress data with percentage calculation
+class DownloadProgress {
+  final int totalBytes;
+  final int downloadedBytes;
+  final double downloadRate;
+  final Duration remainingTime;
+  final DownloadTaskStatus status;
 
-  const HuggingFaceToken({required this.accessToken, required this.tokenType});
+  DownloadProgress({
+    required this.totalBytes,
+    required this.downloadedBytes,
+    required this.downloadRate,
+    required this.remainingTime,
+    required this.status,
+  });
 
-  factory HuggingFaceToken.fromJson(Map<String, dynamic> json) {
-    return HuggingFaceToken(
-      accessToken: json['access_token'] as String,
-      tokenType: json['token_type'] as String? ?? 'Bearer',
-    );
-  }
+  // Calculate progress as 0.0-1.0 ratio
+  double get progress => totalBytes > 0 ? downloadedBytes / totalBytes : 0.0;
+
+  // Convert to percentage (0-100)
+  int get progressPercent => (progress * 100).round();
+}
+
+// Log entry with timestamp formatting for debug display
+class LogEntry {
+  final DateTime timestamp;
+  final String level;
+  final String message;
+
+  LogEntry({
+    required this.timestamp,
+    required this.level,
+    required this.message,
+  });
+
+  // Format time as HH:MM:SS for logs display
+  String get formattedTime =>
+      '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}:${timestamp.second.toString().padLeft(2, '0')}';
+
+  @override
+  String toString() => '[$formattedTime] [$level] $message';
 }
