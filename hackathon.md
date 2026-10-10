@@ -248,6 +248,14 @@
 - **Tests Run**: Token persistence and null check validation.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 30 — Download Task State and Lifecycle Persistence Service)
+- **Status**: Completed
+- **Summary**: Implemented `DownloadStateManager` caching active task IDs and download progress status across application restarts.
+- **Completed Work**: Created `lib/download_page/services/download_state_manager.dart` (45 lines). Persists `DownloadStatus` name strings and background task IDs via `SharedPreferences`, enabling the app to resume tracking downloads when relaunched. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement `HuggingFaceOAuth` service.
+- **Tests Run**: State serialization and deserialization fallback verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
