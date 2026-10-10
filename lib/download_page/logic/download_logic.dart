@@ -6,7 +6,6 @@ import '../models/models.dart';
 import '../services/download_manager.dart';
 import '../services/huggingface_oauth.dart';
 import '../services/token_manager.dart';
-import '../services/logger.dart';
 
 class DownloadLogic {
   final DownloadManager _manager;
