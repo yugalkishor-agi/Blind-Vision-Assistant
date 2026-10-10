@@ -145,6 +145,14 @@
 - **Tests Run**: Camera capture lifecycle, OCR prompt augmentation, and streaming token throttle verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 17 — Service Dependency Injection & Bootstrap Manager)
+- **Status**: Completed
+- **Summary**: Implemented BootstrapManager orchestrating safe initialization order across TTS, OCR, speech dictation, chat helpers, keyboard shortcuts, and Gemma 3n inference.
+- **Completed Work**: Created `lib/chat_page/services/bootstrap_manager.dart` (98 lines). Implemented asynchronous startup dependency ordering (TTS -> OCR -> Speech -> ChatHelpers -> KeyboardHandler -> GemmaService), 30-second timeout watchdog with Completer deadlock protection, and clean lifecycle teardown. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement download page configuration constants and HuggingFace OAuth authentication flow.
+- **Tests Run**: Bootstrap sequencing and Completer timeout handling verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
