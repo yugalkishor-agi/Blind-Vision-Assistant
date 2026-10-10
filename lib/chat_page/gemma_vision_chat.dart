@@ -9,7 +9,7 @@ import 'services/speech_service.dart';
 import 'services/streaming_tts_service.dart';
 import 'services/text_recognition_service.dart';
 import 'models/message_models.dart';
-import '../error_recovery_page.dart';
+import '/error_recovery_page.dart';
 import 'handlers/keyboard_handler.dart';
 import 'widgets/chat_ui_builder.dart';
 import '../settings_page.dart';
