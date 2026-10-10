@@ -1,0 +1,26 @@
+Almost done. One Android config fix needed for flutter_downloader to work properly.
+
+  Open android/app/src/main/AndroidManifest.xml and add a FileProvider inside the <application> tag. This is required by flutter_downloader
+  to save files to app storage.
+
+  Add this inside <application>:
+
+  <provider
+      android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
+      android:authorities="${applicationId}.flutter_downloader.provider"
+      android:exported="false"
+      android:grantUriPermissions="true">
+      <meta-data
+          android:name="android.support.FILE_PROVIDER_PATHS"
+          android:resource="@xml/provider_paths"/>
+  </provider>
+
+  Also create android/app/src/main/res/xml/provider_paths.xml with:
+
+  <?xml version="1.0" encoding="utf-8"?>
+  <paths>
+      <files-path name="files" path="."/>
+      <external-files-path name="external_files" path="."/>
+  </paths>
+
+  Tell me what the current AndroidManifest.xml looks like, make the changes, then log to neatlogs.
