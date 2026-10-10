@@ -1,0 +1,252 @@
+Now create 2 more files — the prompt bar widget and the chat UI builder.
+
+  File 1: lib/chat_page/widgets/prompt_bar.dart
+
+  A StatefulWidget with a public key (PromptBarState) that exposes setText(String) and clear() methods so speech service can fill it. Props:
+  onPromptWithPhoto, onPromptTextOnly, disabled, speechEnabled, listening, onToggleListening, isGenerating, isSpeaking, onStopTts. Has a text
+  field + send button + mic button + stop TTS button.
+
+  import 'package:flutter/material.dart';
+
+  class PromptBar extends StatefulWidget {
+    final Future<void> Function(String) onPromptWithPhoto;
+    final Future<void> Function(String) onPromptTextOnly;
+    final bool disabled;
+    final bool speechEnabled;
+    final bool listening;
+    final VoidCallback onToggleListening;
+    final bool isGenerating;
+    final bool isSpeaking;
+    final VoidCallback onStopTts;
+
+    const PromptBar({
+      Key? key,
+      required this.onPromptWithPhoto,
+      required this.onPromptTextOnly,
+      required this.disabled,
+      required this.speechEnabled,
+      required this.listening,
+      required this.onToggleListening,
+      required this.isGenerating,
+      required this.isSpeaking,
+      required this.onStopTts,
+    }) : super(key: key);
+
+    @override
+    State<PromptBar> createState() => PromptBarState();
+  }
+
+  class PromptBarState extends State<PromptBar> {
+    final _controller = TextEditingController();
+
+    void setText(String text) {
+      _controller.text = text;
+      _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: text.length),
+      );
+    }
+
+    void clear() => _controller.clear();
+
+    Future<void> _sendWithPhoto() async {
+      final text = _controller.text.trim();
+      if (text.isEmpty || widget.disabled) return;
+      _controller.clear();
+      await widget.onPromptWithPhoto(text);
+    }
+
+    Future<void> _sendTextOnly() async {
+      final text = _controller.text.trim();
+      if (text.isEmpty || widget.disabled) return;
+      _controller.clear();
+      await widget.onPromptTextOnly(text);
+    }
+
+    @override
+    void dispose() { _controller.dispose(); super.dispose(); }
+
+    @override
+    Widget build(BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2))],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                label: 'Message input',
+                child: TextField(
+                  controller: _controller,
+                  enabled: !widget.disabled,
+                  decoration: InputDecoration(
+                    hintText: widget.listening ? 'Listening...' : 'Ask something...',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  onSubmitted: (_) => _sendWithPhoto(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            if (widget.isSpeaking)
+              Semantics(
+                label: 'Stop speaking',
+                button: true,
+                child: IconButton(icon: const Icon(Icons.stop_circle, color: Colors.red), onPressed: widget.onStopTts),
+              ),
+            if (widget.speechEnabled)
+              Semantics(
+                label: widget.listening ? 'Stop listening' : 'Start voice input',
+                button: true,
+                child: IconButton(
+                  icon: Icon(widget.listening ? Icons.mic_off : Icons.mic,
+                      color: widget.listening ? Colors.red : Colors.grey),
+                  onPressed: widget.disabled ? null : widget.onToggleListening,
+                ),
+              ),
+            Semantics(
+              label: 'Send with photo',
+              button: true,
+              child: IconButton(
+                icon: const Icon(Icons.camera_alt, color: Color(0xFF4A90D9)),
+                onPressed: widget.disabled ? null : _sendWithPhoto,
+              ),
+            ),
+            Semantics(
+              label: 'Send text only',
+              button: true,
+              child: IconButton(
+                icon: const Icon(Icons.send, color: Color(0xFF4A90D9)),
+                onPressed: widget.disabled ? null : _sendTextOnly,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 2: lib/chat_page/widgets/chat_ui_builder.dart
+
+  Static helper class that builds all major UI sections: loading screen, app bar, view toggle buttons, messages container (ListView of
+  ChatBubble), prompt bar container. No state — pure builder methods.
+
+  import 'package:flutter/material.dart';
+  import '../models/message_models.dart';
+  import 'chat_bubble.dart';
+  import 'prompt_bar.dart';
+
+  class ChatUIBuilder {
+    static Widget buildLoadingScreen() {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF8F9FA),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading AI model...', style: TextStyle(fontSize: 16, color: Colors.grey)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    static PreferredSizeWidget buildCleanAppBar({
+      required VoidCallback onNewChat,
+      required VoidCallback onToggleSettings,
+      required bool isResetting,
+    }) {
+      return AppBar(
+        title: const Text('Blind Vision Assistant', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF4A90D9),
+        foregroundColor: Colors.white,
+        actions: [
+          Semantics(
+            label: 'New chat',
+            button: true,
+            child: IconButton(icon: const Icon(Icons.add), onPressed: isResetting ? null : onNewChat),
+          ),
+          Semantics(
+            label: 'Settings',
+            button: true,
+            child: IconButton(icon: const Icon(Icons.settings), onPressed: onToggleSettings),
+          ),
+        ],
+      );
+    }
+
+    static Widget buildViewToggleButtons({
+      required bool showMessages,
+      required VoidCallback onToggleMessages,
+      required VoidCallback onNewChat,
+      required bool isResetting,
+    }) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            Semantics(
+              label: showMessages ? 'Hide messages' : 'Show messages',
+              button: true,
+              child: ElevatedButton.icon(
+                onPressed: onToggleMessages,
+                icon: Icon(showMessages ? Icons.visibility_off : Icons.visibility),
+                label: Text(showMessages ? 'Hide' : 'Messages'),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    static Widget buildMessagesContainer(List<ChatMessage> messages, ScrollController controller) {
+      return Expanded(
+        child: ListView.builder(
+          controller: controller,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          itemCount: messages.length,
+          itemBuilder: (_, i) => ChatBubble(message: messages[i]),
+        ),
+      );
+    }
+
+    static Widget buildPromptBarContainer({
+      required GlobalKey<PromptBarState> promptBarKey,
+      required Future<void> Function(String) onPromptWithPhoto,
+      required Future<void> Function(String) onPromptTextOnly,
+      required bool disabled,
+      required bool speechEnabled,
+      required bool listening,
+      required VoidCallback onToggleListening,
+      required bool isGenerating,
+      required bool isSpeaking,
+      required VoidCallback onStopTts,
+    }) {
+      return PromptBar(
+        key: promptBarKey,
+        onPromptWithPhoto: onPromptWithPhoto,
+        onPromptTextOnly: onPromptTextOnly,
+        disabled: disabled,
+        speechEnabled: speechEnabled,
+        listening: listening,
+        onToggleListening: onToggleListening,
+        isGenerating: isGenerating,
+        isSpeaking: isSpeaking,
+        onStopTts: onStopTts,
+      );
+    }
+  }
+
+  Create both files. Think about why PromptBarState needs public methods, why a static builder class keeps UI logic separated from state.
+
+  Neatlogs instruction: Log only reasoning — why public setText/clear on PromptBarState, why static builder pattern for UI, why every button
+  has explicit Semantics label. No source code.
+
+  After both, do 2 commits each (feat + docs) and log to neatlogs.
