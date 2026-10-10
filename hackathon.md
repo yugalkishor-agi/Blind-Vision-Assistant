@@ -264,6 +264,14 @@
 - **Tests Run**: PKCE verifier generation and token response parsing validation.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 32 — Download Manager Background Progress and Task Controller)
+- **Status**: Completed
+- **Summary**: Implemented `DownloadManager` orchestrating FlutterDownloader isolate message handling, reactive state broadcast, and task controls.
+- **Completed Work**: Created `lib/download_page/services/download_manager.dart` (95 lines). Listens to native background download updates via `ReceivePort` / `IsolateNameServer`, maps task status into `DownloadStatus`, persists changes through `DownloadStateManager`, and exposes start/pause/resume/cancel controls. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement `DownloadLogic` coordinator.
+- **Tests Run**: Isolate port registration and lifecycle state transition verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
