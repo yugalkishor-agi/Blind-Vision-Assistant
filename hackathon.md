@@ -105,6 +105,14 @@
 - **Tests Run**: Audio asset source path verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 12 — On-Device Text Recognition Engine)
+- **Status**: Completed
+- **Summary**: Implemented TextRecognitionService singleton leveraging Google ML Kit for on-device OCR extraction.
+- **Completed Work**: Created `lib/chat_page/services/text_recognition_service.dart` (35 lines) utilizing Latin script text recognizer with lazy initialization, defensive image validation, and resource cleanup. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement StreamingTtsService for real-time speech synthesis.
+- **Tests Run**: ML Kit Latin script recognizer initialization verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
