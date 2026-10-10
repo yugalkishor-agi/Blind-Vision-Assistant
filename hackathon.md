@@ -320,6 +320,14 @@
 - **Tests Run**: Prompt text persistence, reset action, and backend selection verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 39 — Android FileProvider Storage Configuration for Background Downloader)
+- **Status**: Completed
+- **Summary**: Configured `DownloadedFileProvider` and `provider_paths.xml` allowing `flutter_downloader` to securely persist downloaded model weights to app storage.
+- **Completed Work**: Added `vn.hunghd.flutterdownloader.DownloadedFileProvider` to `android/app/src/main/AndroidManifest.xml` and created `android/app/src/main/res/xml/provider_paths.xml` mapping internal (`files-path`) and external storage directories. Pushed to GitHub with Entire sync.
+- **Planned Work**: Final end-to-end device testing and demonstration packaging.
+- **Tests Run**: Android manifest XML syntax and content provider authority verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
