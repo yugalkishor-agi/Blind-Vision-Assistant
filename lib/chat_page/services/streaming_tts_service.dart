@@ -5,17 +5,14 @@ class StreamingTtsService {
   final FlutterTts _tts;
   final ValueNotifier<bool> isSpeaking = ValueNotifier(false);
   final StringBuffer _buffer = StringBuffer();
-  bool _loading = false;
 
   StreamingTtsService(this._tts);
 
   Future<void> startLoading() async {
-    _loading = true;
     isSpeaking.value = true;
   }
 
   Future<void> stopLoading() async {
-    _loading = false;
     isSpeaking.value = false;
   }
 
@@ -36,7 +33,6 @@ class StreamingTtsService {
 
   Future<void> onMessageComplete() async {
     _speakBuffer();
-    _loading = false;
   }
 
   void reset() {
