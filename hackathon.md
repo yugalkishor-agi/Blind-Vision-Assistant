@@ -280,6 +280,14 @@
 - **Tests Run**: Model installation heuristic and navigation guards verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 34 — Accessible Download UI Helpers and Progress Indicators)
+- **Status**: Completed
+- **Summary**: Implemented `DownloadUIHelpers` with pure static builders for accessibility-labeled progress and action buttons.
+- **Completed Work**: Created `lib/download_page/ui/ui_helpers.dart` (95 lines). Provides `buildProgressSection` wrapping progress bars in `Semantics` percentage readouts, and `buildActionButton` providing accessible buttons for start, pause, resume, and completion states. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement `ModelDownloadPage` widget.
+- **Tests Run**: Progress indicator semantic announcement and button status mapping verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
