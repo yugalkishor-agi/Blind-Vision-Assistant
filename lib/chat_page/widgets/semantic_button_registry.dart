@@ -1,13 +1,46 @@
-import 'package:flutter/material.dart';
+// lib/chat_page/widgets/semantic_button_registry.dart
+import 'package:flutter/foundation.dart';
 
+/// Global registry for managing iOS VoiceOver button activation
+/// Handles the pattern where iOS VoiceOver focuses a button but activation comes through keyboard shortcuts
 class SemanticButtonRegistry {
-  static final Map<String, GlobalKey> _registry = {};
+  /// Currently focused button's callback - only one button can be "current" at a time
+  static VoidCallback? _currentSemanticTap;
 
-  static void register(String label, GlobalKey key) {
-    _registry[label] = key;
+  /// Public getter for accessing current semantic tap (used by keyboard handler)
+  static VoidCallback? get currentSemanticTap => _currentSemanticTap;
+
+  /// Public setter for updating current semantic tap (used by semantic buttons)
+  static set currentSemanticTap(VoidCallback? callback) {
+    _currentSemanticTap = callback;
   }
 
-  static GlobalKey? get(String label) => _registry[label];
+  /// Check if there's a currently registered semantic tap target
+  static bool get hasSemanticTap => _currentSemanticTap != null;
 
-  static void clear() => _registry.clear();
+  /// Register a button as the current semantic target (when it gains accessibility focus)
+  static void registerSemanticTap(VoidCallback callback) {
+    _currentSemanticTap = callback;
+  }
+
+  /// Unregister a specific button when it loses focus (safety check)
+  static void unregisterSemanticTap(VoidCallback callback) {
+    if (_currentSemanticTap == callback) {
+      _currentSemanticTap = null;
+    }
+  }
+
+  /// Invoke the currently registered semantic tap and return success status
+  static bool invokeCurrentSemanticTap() {
+    final hasCallback = _currentSemanticTap != null;
+    if (hasCallback) {
+      _currentSemanticTap!.call();
+    }
+    return hasCallback;
+  }
+
+  /// Clear all registrations (called during cleanup or app state reset)
+  static void clear() {
+    _currentSemanticTap = null;
+  }
 }
