@@ -1,0 +1,54 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K5G8JM44CKNA515BA3DBBR",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T15:04:33.1749554Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "lib/chat_page/gemma_vision_chat.dart"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "47acc6c8d1cc",
+  "checkpoint_transcript_start": 1035,
+  "transcript_lines_at_start": 1035,
+  "token_usage": {
+    "input_tokens": 24070,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 5462470,
+    "output_tokens": 11715,
+    "api_call_count": 43
+  },
+  "session_metrics": {
+    "turn_count": 26
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T15:04:33.105184Z",
+    "agent_lines": 97,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 97,
+    "total_lines_changed": 97,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 123,
+      "user_lines_removed": 79,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "lib/download_page/ui/ui_helpers.dart": 123
+      },
+      "user_removed_per_file": {
+        "lib/download_page/ui/ui_helpers.dart": 79
+      }
+    }
+  ]
+}
