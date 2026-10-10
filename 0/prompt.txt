@@ -1,0 +1,130 @@
+Next file: lib/chat_page/services/gemma_service.dart
+
+  This is the core AI service — a singleton that manages the Gemma model lifecycle. Requirements:
+  - Singleton pattern with private constructor
+  - Uses flutter_gemma package — FlutterGemmaPlugin, InferenceModel, InferenceChat
+  - init(PreferredBackend backend) method — idempotent, loads model from local path using getApplicationDocumentsDirectory(), model filename
+  is gemma-3n-E2B-it-int4.task
+  - Model config: ModelType.gemmaIt, supportImage: true, maxTokens: 8192, maxNumImages: 1
+  - Chat config: temperature: 1, topK: 64, topP: 0.95, tokenBuffer: 512
+  - sendWithStreaming() method — takes text, optional image File, onToken callback, onComplete(MessageStats) callback. Tracks performance:
+  timeToFirstToken, totalLatency, tokenCount, prefillSpeed, decodeSpeed
+  - resetChatSession() — clears history without reloading model
+  - dispose() — full cleanup
+
+  Here's the implementation:
+
+  import 'dart:async';
+  import 'dart:io';
+  import 'package:flutter_gemma/core/model.dart';
+  import 'package:flutter_gemma/flutter_gemma.dart';
+  import 'package:flutter_gemma/pigeon.g.dart';
+  import 'package:path_provider/path_provider.dart';
+  import '../models/message_models.dart';
+
+  class GemmaService {
+    GemmaService._internal();
+    static final GemmaService instance = GemmaService._internal();
+
+    final _gemma = FlutterGemmaPlugin.instance;
+    InferenceModel? _model;
+    InferenceChat? _chat;
+    bool _initialised = false;
+
+    Future<void> init(PreferredBackend backend) async {
+      if (_initialised) return;
+      final dir = await getApplicationDocumentsDirectory();
+      final path = '${dir.path}/gemma-3n-E2B-it-int4.task';
+      if (!await _gemma.modelManager.isModelInstalled && File(path).existsSync()) {
+        await _gemma.modelManager.setModelPath(path);
+      }
+      _model ??= await _gemma.createModel(
+        preferredBackend: backend,
+        modelType: ModelType.gemmaIt,
+        supportImage: true,
+        maxTokens: 8192,
+        maxNumImages: 1,
+      );
+      _chat ??= await _model!.createChat(
+        randomSeed: 1,
+        temperature: 1,
+        topK: 64,
+        topP: 0.95,
+        supportImage: true,
+        tokenBuffer: 512,
+      );
+      _initialised = true;
+    }
+
+    Future<void> sendWithStreaming({
+      required String text,
+      File? image,
+      required Function(String) onToken,
+      required Function(MessageStats) onComplete,
+    }) async {
+      if (!_initialised) throw Exception('GemmaService not initialized');
+      if (_chat == null) throw Exception('Chat not available');
+
+      final startTime = DateTime.now();
+      DateTime? firstTokenTime;
+      int tokenCount = 0;
+
+      if (image != null) {
+        final bytes = await image.readAsBytes();
+        await _chat!.addQuery(Message.withImage(text: text, imageBytes: bytes, isUser: true));
+      } else {
+        await _chat!.addQuery(Message.text(text: text, isUser: true));
+      }
+
+      final completer = Completer<void>();
+
+      _chat!.generateChatResponseAsync().listen(
+        (ModelResponse res) {
+          if (res is TextResponse) {
+            firstTokenTime ??= DateTime.now();
+            tokenCount++;
+            try { onToken(res.token); } catch (_) {}
+          }
+        },
+        onDone: () {
+          final endTime = DateTime.now();
+          final stats = MessageStats(
+            timeToFirstToken: firstTokenTime != null
+                ? firstTokenTime!.difference(startTime).inMilliseconds / 1000.0
+                : null,
+            totalLatency: endTime.difference(startTime).inMilliseconds / 1000.0,
+            tokenCount: tokenCount,
+            prefillSpeed: firstTokenTime != null && tokenCount > 0
+                ? 1000.0 / firstTokenTime!.difference(startTime).inMilliseconds
+                : null,
+            decodeSpeed: firstTokenTime != null && tokenCount > 1
+                ? (tokenCount - 1) * 1000.0 / endTime.difference(firstTokenTime!).inMilliseconds
+                : null,
+          );
+          try { onComplete(stats); } catch (_) {}
+          completer.complete();
+        },
+        onError: (error) => completer.completeError(error),
+      );
+
+      await completer.future;
+    }
+
+    Future<void> resetChatSession() async {
+      if (!_initialised) return;
+      await _chat?.clearHistory();
+    }
+
+    Future<void> dispose() async {
+      await _model?.close();
+      await _gemma.modelManager.deleteModel();
+      _model = null;
+      _chat = null;
+      _initialised = false;
+    }
+  }
+
+  Neatlogs instruction: Log only the reasoning — why singleton, why idempotent init, why streaming with callbacks, why performance stats
+  matter for on-device AI. No raw source code in the trace.
+
+  After writing, confirm file path and log to neatlogs.
