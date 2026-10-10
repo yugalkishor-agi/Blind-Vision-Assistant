@@ -256,6 +256,14 @@
 - **Tests Run**: State serialization and deserialization fallback verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 31 — HuggingFace OAuth PKCE Authentication Flow)
+- **Status**: Completed
+- **Summary**: Implemented `HuggingFaceOAuth` executing RFC 7636 PKCE (Proof Key for Code Exchange) auth without hardcoding client secrets.
+- **Completed Work**: Created `lib/download_page/services/huggingface_oauth.dart` (65 lines). Generates high-entropy code verifier and SHA-256 challenge, opens custom tab authentication using `FlutterWebAuth2`, and exchanges auth codes for bearer tokens. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement download manager business logic and UI view.
+- **Tests Run**: PKCE verifier generation and token response parsing validation.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
