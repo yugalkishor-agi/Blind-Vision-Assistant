@@ -185,6 +185,14 @@
 - **Tests Run**: User vs AI styling, streaming dots animation, and markdown semantics validation.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 22 — Accessible Prompt Bar Input Controller)
+- **Status**: Completed
+- **Summary**: Implemented PromptBar widget with public controller methods for programmatic voice-to-text population and accessible multimodal send controls.
+- **Completed Work**: Created `lib/chat_page/widgets/prompt_bar.dart` (99 lines). Features public `setText` and `clear` API on `PromptBarState` for external `SpeechService` dictation binding, explicit Semantics labels for photo/text send buttons and speech toggles, and reactive TTS stop control. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement ChatUIBuilder pure static builder.
+- **Tests Run**: Controller text mutation, cursor positioning, and action callback bindings verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
