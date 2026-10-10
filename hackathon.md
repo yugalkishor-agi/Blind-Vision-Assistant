@@ -272,6 +272,14 @@
 - **Tests Run**: Isolate port registration and lifecycle state transition verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 33 — Download Logic Coordinator and Model Integrity Validator)
+- **Status**: Completed
+- **Summary**: Implemented `DownloadLogic` binding download services, authentication, model size validation, and screen navigation.
+- **Completed Work**: Created `lib/download_page/logic/download_logic.dart` (66 lines). Validates installed model presence and integrity (>100MB threshold), coordinates OAuth login with token caching, and manages transition to the main chat route upon download completion. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement download UI widgets and views.
+- **Tests Run**: Model installation heuristic and navigation guards verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
