@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JXVP2KSZ4DNZFZDXR6382Z",
+  "session_id": "41b5c99f-d1b0-405a-ad05-ac911a723a83",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T12:50:58.8268069Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "assets/dictation_start.mp3",
+    "assets/dictation_stop.mp3",
+    "assets/woosh.mp3",
+    "lib/chat_page/config/.gitkeep",
+    "lib/chat_page/handlers/.gitkeep",
+    "lib/chat_page/models/.gitkeep",
+    "lib/chat_page/services/.gitkeep",
+    "lib/chat_page/widgets/.gitkeep",
+    "lib/download_page/config/.gitkeep",
+    "lib/download_page/logic/.gitkeep",
+    "lib/download_page/models/.gitkeep",
+    "lib/download_page/services/.gitkeep",
+    "lib/download_page/ui/.gitkeep"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "17a894eb0086",
+  "checkpoint_transcript_start": 141,
+  "transcript_lines_at_start": 141,
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T12:50:58.8054805Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 0,
+    "total_lines_changed": 0,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
