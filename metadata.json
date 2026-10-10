@@ -3,7 +3,7 @@
   "checkpoint_id": "01M4K1GKV5Y61CDPYK7B8AJZKA",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 3,
+  "checkpoints_count": 4,
   "files_touched": [
     "lib/chat_page/handlers/.gitkeep",
     "lib/download_page/config/.gitkeep",
@@ -14,6 +14,12 @@
       "metadata": "/0/metadata.json",
       "transcript": "/0/full.jsonl",
       "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "content_hash": "/1/content_hash.txt",
       "prompt": ""
     }
   ]
