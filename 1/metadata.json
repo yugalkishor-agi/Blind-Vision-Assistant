@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JWWZ66057S1Q42DN7FKHKA",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T12:34:12.4738271Z",
+  "branch": "main",
+  "checkpoints_count": 7,
+  "files_touched": [
+    "android/.gitignore",
+    "android/app/build.gradle.kts",
+    "android/app/src/debug/AndroidManifest.xml",
+    "android/app/src/main/AndroidManifest.xml",
+    "android/app/src/main/kotlin/com/hackathon/blind_vision_assistant/MainActivity.kt",
+    "android/app/src/main/res/drawable-v21/launch_background.xml",
+    "android/app/src/main/res/drawable/launch_background.xml",
+    "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+    "android/app/src/main/res/values-night/styles.xml",
+    "android/app/src/main/res/values/styles.xml",
+    "android/app/src/profile/AndroidManifest.xml",
+    "android/build.gradle.kts",
+    "android/gradle.properties",
+    "android/gradle/wrapper/gradle-wrapper.properties",
+    "android/settings.gradle.kts"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "c9a6e4d98cbd",
+  "checkpoint_transcript_start": 158,
+  "transcript_lines_at_start": 158,
+  "session_metrics": {
+    "turn_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T12:34:12.4356234Z",
+    "agent_lines": 240,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 240,
+    "total_lines_changed": 240,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
