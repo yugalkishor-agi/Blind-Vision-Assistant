@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K46K7H8VKHCYHW67WHPSYJ",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T14:41:47.827361Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "lib/download_page/services/huggingface_oauth.dart"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "c6226d282444",
+  "session_metrics": {
+    "turn_count": 23
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T14:41:47.6520471Z",
+    "agent_lines": 64,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 64,
+    "total_lines_changed": 64,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
