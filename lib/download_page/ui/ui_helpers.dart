@@ -1,94 +1,138 @@
+// download_page/ui/ui_helpers.dart
+
 import 'package:flutter/material.dart';
-import '../models/enums.dart';
+import 'package:flutter/services.dart';
+import '../services/logger.dart';
 
-class DownloadUIHelpers {
-  static String getStatusText(DownloadStatus status, int progress) {
-    switch (status) {
-      case DownloadStatus.notStarted: return 'Ready to download';
-      case DownloadStatus.downloading: return 'Downloading... $progress%';
-      case DownloadStatus.paused: return 'Paused at $progress%';
-      case DownloadStatus.completed: return 'Download complete';
-      case DownloadStatus.failed: return 'Download failed';
-      case DownloadStatus.cancelled: return 'Download cancelled';
+class UIHelpers {
+  /// Color-codes log levels for better visual distinction
+  static Color getLogColor(String level) {
+    switch (level) {
+      case 'ERROR':
+        return Colors.red;
+      case 'WARN':
+        return Colors.orange;
+      case 'INFO':
+        return Colors.blue;
+      case 'DEBUG':
+        return Colors.grey;
+      default:
+        return Colors.black;
     }
   }
 
-  static Color getStatusColor(DownloadStatus status) {
-    switch (status) {
-      case DownloadStatus.completed: return Colors.green;
-      case DownloadStatus.failed: return Colors.red;
-      case DownloadStatus.downloading: return Colors.blue;
-      case DownloadStatus.paused: return Colors.orange;
-      default: return Colors.grey;
-    }
-  }
-
-  static Widget buildProgressSection(DownloadStatus status, int progress) {
-    final isRunning = status == DownloadStatus.downloading || status == DownloadStatus.paused;
-    return Column(
-      children: [
-        Semantics(
-          label: getStatusText(status, progress),
-          child: LinearProgressIndicator(
-            value: isRunning ? progress / 100.0 : null,
-            backgroundColor: Colors.grey.shade200,
-            valueColor: AlwaysStoppedAnimation(getStatusColor(status)),
+  /// Debug dialog with copy/clear functionality for troubleshooting
+  static void showLogsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Logs'),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.copy),
+                  onPressed: () {
+                    Clipboard.setData(
+                      ClipboardData(text: Logger.getAllLogsAsString()),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Logs copied to clipboard')),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    Logger.clear();
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: ListView.builder(
+            itemCount: Logger.logs.length,
+            itemBuilder: (context, index) {
+              final log = Logger.logs[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(
+                  log.toString(),
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    color: getLogColor(log.level),
+                  ),
+                ),
+              );
+            },
           ),
         ),
-        const SizedBox(height: 8),
-        Text(getStatusText(status, progress),
-            style: TextStyle(color: getStatusColor(status), fontWeight: FontWeight.w500)),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 
-  static Widget buildActionButton({
-    required DownloadStatus status,
-    required VoidCallback onStart,
-    required VoidCallback onPause,
-    required VoidCallback onResume,
-    required VoidCallback onCancel,
-  }) {
-    switch (status) {
-      case DownloadStatus.notStarted:
-      case DownloadStatus.failed:
-      case DownloadStatus.cancelled:
-        return Semantics(
-          label: 'Download AI model', button: true,
-          child: ElevatedButton.icon(
-            onPressed: onStart, icon: const Icon(Icons.download),
-            label: const Text('Download Model (~3GB)'),
-          ),
-        );
-      case DownloadStatus.downloading:
-        return Semantics(
-          label: 'Pause download', button: true,
-          child: ElevatedButton.icon(
-            onPressed: onPause, icon: const Icon(Icons.pause),
-            label: const Text('Pause'),
-          ),
-        );
-      case DownloadStatus.paused:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+  /// Error display dialog with copy functionality for support/debugging
+  static void showErrorDialog(
+    BuildContext context,
+    List<String> errorMessages,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Semantics(label: 'Resume download', button: true,
-              child: ElevatedButton.icon(onPressed: onResume,
-                icon: const Icon(Icons.play_arrow), label: const Text('Resume'))),
-            const SizedBox(width: 12),
-            Semantics(label: 'Cancel download', button: true,
-              child: OutlinedButton.icon(onPressed: onCancel,
-                icon: const Icon(Icons.cancel), label: const Text('Cancel'))),
+            const Text('Error Messages'),
+            IconButton(
+              icon: const Icon(Icons.copy),
+              onPressed: () {
+                Clipboard.setData(
+                  ClipboardData(text: errorMessages.join('\n')),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Errors copied to clipboard')),
+                );
+              },
+            ),
           ],
-        );
-      case DownloadStatus.completed:
-        return Semantics(
-          label: 'Open Blind Vision Assistant', button: true,
-          child: ElevatedButton.icon(
-            onPressed: onStart, icon: const Icon(Icons.visibility),
-            label: const Text('Open App'),
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: ListView.builder(
+            itemCount: errorMessages.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  errorMessages[index],
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            },
           ),
-        );
-    }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 }
