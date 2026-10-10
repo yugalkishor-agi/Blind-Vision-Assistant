@@ -1,0 +1,86 @@
+Now create 3 download page files together.
+
+  File 1: lib/download_page/models/enums.dart
+
+  Download state enum:
+
+  enum DownloadStatus {
+    notStarted,
+    downloading,
+    paused,
+    completed,
+    failed,
+    cancelled,
+  }
+
+  File 2: lib/download_page/models/models.dart
+
+  Data models for download state and HuggingFace token:
+
+  import 'enums.dart';
+
+  class DownloadState {
+    final DownloadStatus status;
+    final int progress;
+    final String? taskId;
+    final String? errorMessage;
+
+    const DownloadState({
+      this.status = DownloadStatus.notStarted,
+      this.progress = 0,
+      this.taskId,
+      this.errorMessage,
+    });
+
+    DownloadState copyWith({
+      DownloadStatus? status,
+      int? progress,
+      String? taskId,
+      String? errorMessage,
+    }) {
+      return DownloadState(
+        status: status ?? this.status,
+        progress: progress ?? this.progress,
+        taskId: taskId ?? this.taskId,
+        errorMessage: errorMessage ?? this.errorMessage,
+      );
+    }
+  }
+
+  class HuggingFaceToken {
+    final String accessToken;
+    final String tokenType;
+
+    const HuggingFaceToken({required this.accessToken, required this.tokenType});
+
+    factory HuggingFaceToken.fromJson(Map<String, dynamic> json) {
+      return HuggingFaceToken(
+        accessToken: json['access_token'] as String,
+        tokenType: json['token_type'] as String? ?? 'Bearer',
+      );
+    }
+  }
+
+  File 3: lib/download_page/services/logger.dart
+
+  Simple debug logger:
+
+  import 'package:flutter/foundation.dart';
+
+  class AppLogger {
+    static void log(String message) {
+      if (kDebugMode) debugPrint('[BlindVision] $message');
+    }
+
+    static void error(String message, [Object? error]) {
+      if (kDebugMode) debugPrint('[BlindVision ERROR] $message${error != null ? ': $error' : ''}');
+    }
+  }
+
+  Create all 3 files. Think about why a dedicated enum for download states, why copyWith pattern for immutable state, why a centralized
+  logger.
+
+  Neatlogs instruction: Log only reasoning — why enum over bool flags for download state, why immutable DownloadState with copyWith, why
+  debug-only logging for privacy. No source code.
+
+  After all 3, do 2 commits each (feat + docs) and log to neatlogs.
