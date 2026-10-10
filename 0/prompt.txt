@@ -1,0 +1,28 @@
+Now set up the Android configuration. Do the following 3 things:
+
+  1. In android/app/build.gradle.kts, set:
+  - minSdk = 26
+  - targetSdk = 35
+  - compileSdk = 35
+
+  2. Replace the contents of android/app/src/main/AndroidManifest.xml with permissions for camera, microphone, internet, and storage. Keep
+  the existing package name com.hackathon.blind_vision_assistant.
+
+  Required permissions to add:
+
+  <uses-permission android:name="android.permission.CAMERA"/>
+  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+  Also add android:requestLegacyExternalStorage="true" to the <application> tag.
+
+  3. In android/gradle.properties, add:
+
+  android.useAndroidX=true
+  android.enableJetifier=true
+
+  Before making changes, tell me what the current content of each of these 3 files is. Then make the changes. Then log to neatlogs.

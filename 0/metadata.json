@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JXKE97M8QWM30C3HJXVD42",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T12:46:28.61468Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "android/app/build.gradle.kts",
+    "android/app/src/main/AndroidManifest.xml"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "0b52982ea660",
+  "checkpoint_transcript_start": 224,
+  "transcript_lines_at_start": 224,
+  "token_usage": {
+    "input_tokens": 6020,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2456157,
+    "output_tokens": 2267,
+    "api_call_count": 16
+  },
+  "session_metrics": {
+    "turn_count": 9
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T12:46:28.5832816Z",
+    "agent_lines": 16,
+    "agent_removed": 5,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 16,
+    "total_lines_changed": 21,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
