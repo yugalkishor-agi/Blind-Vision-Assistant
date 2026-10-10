@@ -177,6 +177,14 @@
 - **Tests Run**: Semantics node binding and registry registration verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 21 — Accessible Chat Bubble with Streaming Indicator)
+- **Status**: Completed
+- **Summary**: Implemented ChatBubble widget rendering multimodal chat messages, markdown formatting, and animated streaming dots.
+- **Completed Work**: Created `lib/chat_page/widgets/chat_bubble.dart` (82 lines). Integrated `GptMarkdown` with accessibility `Semantics` label wrapper, animated pulsing dots during active generation, thumbnail rendering for captured camera snapshots, and inference latency telemetry display. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement PromptBar input widget and ChatPageView screen.
+- **Tests Run**: User vs AI styling, streaming dots animation, and markdown semantics validation.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
