@@ -1,0 +1,18 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K4E7W6512T9XMHP1AK5QDA",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "lib/download_page/logic/download_logic.dart"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ]
+}
