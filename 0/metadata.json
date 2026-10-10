@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K47564CDTPNKKRFJ787NAW",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T14:42:06.0703401Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "hackathon.md"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "c6226d282444",
+  "checkpoint_transcript_start": 943,
+  "transcript_lines_at_start": 943,
+  "session_metrics": {
+    "turn_count": 23
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T14:42:06.0230246Z",
+    "agent_lines": 8,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 8,
+    "total_lines_changed": 8,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
