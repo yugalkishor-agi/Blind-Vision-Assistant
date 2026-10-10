@@ -57,6 +57,14 @@
 - **Tests Run**: `flutter pub get` executed cleanly with exit code 0.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 6 — Android Native Hardware & Permission Configuration)
+- **Status**: Completed
+- **Summary**: Configured Android SDK levels and runtime permissions for offline vision assistant.
+- **Completed Work**: Set `compileSdk = 35`, `targetSdk = 35`, and `minSdk = 26` in `android/app/build.gradle.kts`. Configured permissions for camera, audio recording, internet, external storage, wake lock, foreground service, and legacy storage in `AndroidManifest.xml`. Confirmed AndroidX and Jetifier in `gradle.properties`.
+- **Planned Work**: Implement Flutter service layers (camera, TTS, speech, Gemma vision engine).
+- **Tests Run**: Gradle manifest and properties syntax verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
