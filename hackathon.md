@@ -73,6 +73,14 @@
 - **Tests Run**: Filesystem tree verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 8 — Core Chat & Performance Models Implementation)
+- **Status**: Completed
+- **Summary**: Implemented foundational multimodal message and latency telemetry models.
+- **Completed Work**: Created `lib/chat_page/models/message_models.dart` (44 lines) defining `ChatMessage` (with factory constructors for text & image messages) and `MessageStats` (tracking time-to-first-token, latency, token count, prefill & decode speeds). Pushed to GitHub with Entire checkpoint sync.
+- **Planned Work**: Implement camera handler, TTS/STT services, and UI widgets.
+- **Tests Run**: Dart syntax and null-safety verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
