@@ -5,7 +5,7 @@ import 'chat_page/config/system_prompts.dart';
 class SettingsPage extends StatefulWidget {
   final String systemContext;
   final PreferredBackend backend;
-  const SettingsPage({Key? key, required this.systemContext, required this.backend}) : super(key: key);
+  const SettingsPage({super.key, required this.systemContext, required this.backend});
   @override State<SettingsPage> createState() => _SettingsPageState();
 }
 
