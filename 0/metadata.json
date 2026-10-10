@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K43P1F80Y4GTF3X00TCS9K",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T14:40:12.2675069Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "lib/download_page/services/token_manager.dart"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "c6226d282444",
+  "checkpoint_transcript_start": 915,
+  "transcript_lines_at_start": 915,
+  "token_usage": {
+    "input_tokens": 16535,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3684079,
+    "output_tokens": 7865,
+    "api_call_count": 52
+  },
+  "session_metrics": {
+    "turn_count": 23
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T14:40:12.208261Z",
+    "agent_lines": 41,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 41,
+    "total_lines_changed": 41,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

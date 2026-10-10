@@ -1,0 +1,177 @@
+Now create 3 more download page files together.
+
+  File 1: lib/download_page/services/token_manager.dart
+
+  Manages HuggingFace OAuth token storage using shared_preferences:
+
+  import 'package:shared_preferences/shared_preferences.dart';
+  import '../config/constants.dart';
+  import '../models/models.dart';
+  import 'logger.dart';
+
+  class TokenManager {
+    static Future<void> saveToken(HuggingFaceToken token) async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(authTokenKey, token.accessToken);
+        AppLogger.log('Token saved successfully');
+      } catch (e) {
+        AppLogger.error('Failed to save token', e);
+      }
+    }
+
+    static Future<String?> getToken() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        return prefs.getString(authTokenKey);
+      } catch (e) {
+        AppLogger.error('Failed to get token', e);
+        return null;
+      }
+    }
+
+    static Future<void> clearToken() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(authTokenKey);
+        AppLogger.log('Token cleared');
+      } catch (e) {
+        AppLogger.error('Failed to clear token', e);
+      }
+    }
+
+    static Future<bool> hasToken() async {
+      final token = await getToken();
+      return token != null && token.isNotEmpty;
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 2: lib/download_page/services/download_state_manager.dart
+
+  Persists download task state using shared_preferences:
+
+  import 'package:shared_preferences/shared_preferences.dart';
+  import '../config/constants.dart';
+  import '../models/enums.dart';
+  import '../models/models.dart';
+  import 'logger.dart';
+
+  class DownloadStateManager {
+    static Future<void> saveState(DownloadState state) async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(downloadStateKey, state.status.name);
+        if (state.taskId != null) await prefs.setString(downloadTaskIdKey, state.taskId!);
+        AppLogger.log('Download state saved: ${state.status.name}');
+      } catch (e) {
+        AppLogger.error('Failed to save download state', e);
+      }
+    }
+
+    static Future<DownloadState> loadState() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final statusName = prefs.getString(downloadStateKey);
+        final taskId = prefs.getString(downloadTaskIdKey);
+        final status = DownloadStatus.values.firstWhere(
+          (s) => s.name == statusName,
+          orElse: () => DownloadStatus.notStarted,
+        );
+        return DownloadState(status: status, taskId: taskId);
+      } catch (e) {
+        AppLogger.error('Failed to load download state', e);
+        return const DownloadState();
+      }
+    }
+
+    static Future<void> clearState() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(downloadStateKey);
+        await prefs.remove(downloadTaskIdKey);
+      } catch (e) {
+        AppLogger.error('Failed to clear download state', e);
+      }
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 3: lib/download_page/services/huggingface_oauth.dart
+
+  HuggingFace OAuth PKCE flow using flutter_web_auth_2 and crypto:
+
+  import 'dart:convert';
+  import 'dart:math';
+  import 'package:crypto/crypto.dart';
+  import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+  import 'package:http/http.dart' as http;
+  import '../config/constants.dart';
+  import '../models/models.dart';
+  import 'logger.dart';
+
+  class HuggingFaceOAuth {
+    static String _generateCodeVerifier() {
+      final random = Random.secure();
+      final bytes = List<int>.generate(32, (_) => random.nextInt(256));
+      return base64UrlEncode(bytes).replaceAll('=', '');
+    }
+
+    static String _generateCodeChallenge(String verifier) {
+      final bytes = utf8.encode(verifier);
+      final digest = sha256.convert(bytes);
+      return base64UrlEncode(digest.bytes).replaceAll('=', '');
+    }
+
+    static Future<HuggingFaceToken?> authenticate() async {
+      try {
+        final verifier = _generateCodeVerifier();
+        final challenge = _generateCodeChallenge(verifier);
+        final state = base64UrlEncode(List<int>.generate(16, (_) => Random.secure().nextInt(256)));
+
+        final authUri = Uri.parse(authEndpoint).replace(queryParameters: {
+          'client_id': hfClientId,
+          'redirect_uri': hfRedirectUri,
+          'scope': scope,
+          'response_type': 'code',
+          'code_challenge': challenge,
+          'code_challenge_method': 'S256',
+          'state': state,
+        });
+
+        final result = await FlutterWebAuth2.authenticate(
+          url: authUri.toString(),
+          callbackUrlScheme: 'com.hackathon.blind_vision_assistant',
+        );
+
+        final code = Uri.parse(result).queryParameters['code'];
+        if (code == null) return null;
+
+        final response = await http.post(Uri.parse(tokenEndpoint), body: {
+          'client_id': hfClientId,
+          'code': code,
+          'code_verifier': verifier,
+          'grant_type': 'authorization_code',
+          'redirect_uri': hfRedirectUri,
+        });
+
+        if (response.statusCode == 200) {
+          return HuggingFaceToken.fromJson(jsonDecode(response.body));
+        }
+        return null;
+      } catch (e) {
+        AppLogger.error('OAuth failed', e);
+        return null;
+      }
+    }
+  }
+
+  Create all 3 files. Think about why PKCE is used instead of simple OAuth, why download state must persist across app restarts, why token is
+  stored separately from download state.
+
+  Neatlogs instruction: Log only reasoning — why PKCE for OAuth, why persistent download state for 3GB file, why token and download state are
+  separate concerns. No source code.
+
+  After all 3, do 2 commits each (feat + docs) and log to neatlogs.
