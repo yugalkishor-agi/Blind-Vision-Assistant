@@ -1,0 +1,58 @@
+Create lib/chat_page/models/message_models.dart for our vision AI chat app.
+
+  Requirements:
+  - A ChatMessage class that supports text-only and image messages
+  - Fields: text content, isUser flag, streaming state, optional image path, optional performance stats
+  - A MessageStats class with: timeToFirstToken, totalLatency, tokenCount, prefillSpeed, decodeSpeed
+  - Two factory constructors: ChatMessage.text() and ChatMessage.withImageFile()
+
+  Here's the implementation to use:
+
+  class ChatMessage {
+    String text;
+    final bool isUser;
+    bool isStreaming;
+    MessageStats? stats;
+    final String? imagePath;
+
+    ChatMessage._({
+      required this.text,
+      required this.isUser,
+      this.isStreaming = false,
+      this.stats,
+      this.imagePath,
+    });
+
+    factory ChatMessage.text(String text, {required bool isUser, bool isStreaming = false}) {
+      return ChatMessage._(text: text, isUser: isUser, isStreaming: isStreaming);
+    }
+
+    factory ChatMessage.withImageFile(String text, {required bool isUser, dynamic imageFile}) {
+      return ChatMessage._(
+        text: text,
+        isUser: isUser,
+        imagePath: imageFile?.path,
+      );
+    }
+  }
+
+  class MessageStats {
+    final double? timeToFirstToken;
+    final double totalLatency;
+    final int tokenCount;
+    final double? prefillSpeed;
+    final double? decodeSpeed;
+
+    MessageStats({
+      this.timeToFirstToken,
+      required this.totalLatency,
+      required this.tokenCount,
+      this.prefillSpeed,
+      this.decodeSpeed,
+    });
+  }
+
+  Neatlogs instruction: In the trace, log only your reasoning for the design decisions (why factory constructors, why MessageStats is
+  separate, etc.) — do not log the raw source code.
+
+  After writing, confirm file path and log to neatlogs.
