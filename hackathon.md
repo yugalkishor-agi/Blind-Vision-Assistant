@@ -224,6 +224,14 @@
 - **Tests Run**: Enum values and exhaustiveness switch structure verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 27 — Immutable Download State and HuggingFace Token Models)
+- **Status**: Completed
+- **Summary**: Implemented immutable data models `DownloadState` and `HuggingFaceToken` for predictable state transitions and auth deserialization.
+- **Completed Work**: Created `lib/download_page/models/models.dart` (44 lines). Implements `DownloadState` with immutable `copyWith` semantics to avoid race conditions during async isolate progress updates, and `HuggingFaceToken` with JSON factory parser for OAuth credentials. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement `AppLogger` service.
+- **Tests Run**: Immutable copyWith updates and JSON factory deserialization verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
