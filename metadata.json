@@ -3,7 +3,7 @@
   "checkpoint_id": "01M4JXVP2KSZ4DNZFZDXR6382Z",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 3,
+  "checkpoints_count": 4,
   "files_touched": [
     "assets/dictation_start.mp3",
     "assets/dictation_stop.mp3",
@@ -25,6 +25,19 @@
       "transcript": "/0/full.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": ""
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
-  ]
+  ],
+  "token_usage": {
+    "input_tokens": 13286,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 4814471,
+    "output_tokens": 6511,
+    "api_call_count": 29
+  }
 }

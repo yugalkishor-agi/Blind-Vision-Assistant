@@ -1,0 +1,27 @@
+Now create the assets folder and the core folder structure for the app. Do these steps:
+
+  1. Create this folder structure inside C:\Users\bindu\Desktop\Projects\hackathon:
+
+  assets/
+  lib/
+    chat_page/
+      config/
+      handlers/
+      models/
+      services/
+      widgets/
+    download_page/
+      config/
+      logic/
+      models/
+      services/
+      ui/
+
+  2. Create 3 placeholder audio files in assets/ — just empty files for now:
+  - assets/woosh.mp3
+  - assets/dictation_start.mp3
+  - assets/dictation_stop.mp3
+
+  3. Tell me exactly which folders and files you created.
+
+  No Dart code yet. After creating, log this to neatlogs.
