@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K2R45BMYYXWQZX1QC4FAS0",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T14:16:25.1085757Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "lib/chat_page/widgets/chat_ui_builder.dart"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "027d3c9e39b3",
+  "session_metrics": {
+    "turn_count": 19
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T14:16:24.960941Z",
+    "agent_lines": 36,
+    "agent_removed": 0,
+    "human_added": 232,
+    "human_modified": 60,
+    "human_removed": 0,
+    "total_committed": 328,
+    "total_lines_changed": 328,
+    "agent_percentage": 10.975609756097562,
+    "metric_version": 2
+  }
+}
