@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K1DV7RK5PCT74G77GZG017",
+  "session_id": "41b5c99f-d1b0-405a-ad05-ac911a723a83",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T13:53:19.6100955Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "lib/chat_page/services/bootstrap_manager.dart"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "17a894eb0086",
+  "checkpoint_transcript_start": 141,
+  "transcript_lines_at_start": 141,
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T13:53:19.5920829Z",
+    "agent_lines": 97,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 97,
+    "total_lines_changed": 97,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
