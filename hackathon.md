@@ -232,6 +232,14 @@
 - **Tests Run**: Immutable copyWith updates and JSON factory deserialization verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 28 — Debug-Only Privacy-Preserving Logger Service)
+- **Status**: Completed
+- **Summary**: Implemented `AppLogger` utility enforcing debug-only telemetry output via `kDebugMode` guards.
+- **Completed Work**: Created `lib/download_page/services/logger.dart` (12 lines). Provides standardized console and error logging that compiles to no-ops in release builds, protecting user privacy and preventing sensitive tokens or paths from leaking into production system logs. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement download state management and UI widgets.
+- **Tests Run**: kDebugMode gating and error formatting validation.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
