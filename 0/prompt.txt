@@ -1,0 +1,137 @@
+v
+Yugal's project
+send your first trace
+waiting
+connect your app below. we'll detect the first trace live and take you in.
+
+agent prompt
+CLI
+import
+manual setup
+# Trace an AI agent with Neatlogs
+
+Set up Neatlogs tracing in this working directory. Follow these steps in order.
+
+## Step 1: Set up Neatlogs access
+
+Neatlogs project ID: `92d28fb4-4c45-4b0b-a5d0-63e8253579ce`
+
+Set `NEATLOGS_API_KEY` to the key below in the shell the user will run the app from,
+for example `export NEATLOGS_API_KEY="REDACTED"`. If the app loads a
+`.env` file, add it there instead. Do not commit the key to version control.
+
+```
+REDACTED
+```
+
+Never replace this key with a guessed or invented one.
+
+## Step 2: Detect the language and stack
+
+Look at the workspace and determine the language and which LLM providers / agent frameworks it uses. If the project spans more than one language, instrument each one. If the project is a monorepo, check the git root to get oriented, but only ever instrument services in or below the current working directory — never a sibling or parent app outside it, even if a workspace/compose config references one.
+
+**Finding independent services.** A monorepo can bundle several independently-deployable services; each one that reaches an LLM/agent/tool call gets treated as its own entry point later (own workflow name in Step 4) — skip health/readiness/CRUD-only services that never call a model entirely. Check these signals in order and stop at the first one that finds more than one service directory:
+
+1. **Workspace config** (most authoritative) — a `workspaces` field in the root `package.json`, or a `packages` field in `pnpm-workspace.yaml`. Resolve those glob patterns to directories, then keep only the ones that actually have their own manifest (`package.json`, `pyproject.toml`, `go.mod`, etc.) — a glob can match a plain non-package directory too.
+2. **docker-compose** — `docker-compose.yml`/`docker-compose.yaml`/`compose.yml`/`compose.yaml` at the root. Each entry under `services:` whose `build` (a plain string, or an object's `context` field) resolves to an existing directory is one service.
+3. **Scattered manifests** (fallback, only if neither signal above found more than one) — search for manifest files (`package.json`, `pyproject.toml`, `go.mod`, etc.) up to 4 directories deep, excluding `node_modules`, `.git`, `dist`, `build`, `.next`, `venv`, `.venv`, `__pycache__`, `target`, `.turbo`, `vendor`. Drop the repo root's own manifest (that's the whole-repo language, not a separate service) and drop any candidate directory that's nested inside another candidate — a service's own internal shared-lib subpackage is not a separate service.
+
+Edge case: if exactly one of these signals finds exactly one nested service, and the repo root itself has no manifest/language of its own, use that single nested directory as the actual service root instead of the top-level directory — it IS the real service, just not living at the repo root (e.g. a `services/api/` with nothing else at the top level).
+
+If none of the three signals finds more than one candidate, treat the whole repo at the current working directory as a single service — this is the common case, and nothing else here changes for it. For every service found this way, only keep it if it reaches an LLM/agent/tool call — drop the rest, per the CRUD/health-check exclusion above.
+
+**Identifying entry points within each service.** A single service usually has several independent, separately-triggerable capabilities — these are the actual entry points, not the service as a whole. Typical shapes: an HTTP route, a CLI command/subcommand, a cron/scheduled job, a queue/stream consumer (Kafka/SQS/Celery/RabbitMQ/BullMQ — one entry point per message/task type, not one for the whole consumer loop), a webhook/event handler, an agent-loop iteration, or a public library API function. Two things commonly get this wrong:
+
+- **Altitude** — an internal helper the entry point calls into (`run_pipeline`, `process_document`, `process_chunk`) is NOT itself an entry point; the entry point is the outer route/command/job that calls it.
+- **Multiplexed entry** — if one transport dispatches to several different capabilities (a single `/run` route branching on a `task_type` field, a Celery task branching by job kind, an argparse dispatcher, a Kafka consumer loop branching on `msg.topic`/`event_type`), treat EACH BRANCH as its own entry point — never the shared dispatcher as one entry point covering all of them.
+
+For each entry point, also note its process kind — it changes how you initialize and where spans root:
+
+- **One-shot script**: initialize once near the top, and end by flushing/shutting down the SDK (its process exits immediately after, and unflushed spans batched in memory are otherwise lost).
+- **Long-running server**: initialize once at process startup — never inside a request handler — and only flush/shut down on process shutdown, not per request. Root each request under its own span (e.g. a `WORKFLOW` on the handler) so concurrent requests don't share one trace.
+- **Concurrent operations within one entry point** (goroutines, worker threads, manual thread pools — not plain `async`/`await` in the same coroutine, which propagates context on its own): context does not always propagate automatically across a new thread or goroutine. Check Step 3's reference for whether this language/runtime requires threading the trace context through explicitly (Go always does) or handles it for you.
+
+Neatlogs has a native SDK for Python, TypeScript, and Go — if the detected language is one of those, continue to Step 3. For any OTHER language, there is no Neatlogs SDK; pick ONE of these two paths instead, and skip Step 3 (its SDK integration-mechanism guidance is not applicable here):
+
+- **Default: the dependency-free HTTP endpoint.** Use this unless the app already has OpenTelemetry, or the language's OTel support is clearly the more idiomatic fit (e.g. Java, .NET). Follow https://docs.neatlogs.com/sdk/http-injection exactly, but send to the regional URL `https://ingest.neatlogs.com/v1/trace` instead of any default host shown in the guide. The mechanism is fundamentally different from Steps 3–4 below: build ONE nested JSON tree (an object with a `children` array) as the code for one entry-point invocation runs, then send it as a SINGLE `POST /v1/trace` when that invocation completes — success or error, so wrap the send in this language's try/finally-equivalent. Never POST once per span; that violates the endpoint's contract and produces disconnected traces instead of one.
+- **OpenTelemetry / OTLP-gRPC, when the app already emits OpenTelemetry spans** (its own `tracer.start_span()`-style setup, an OTel Collector, or a GenAI-instrumented framework) **or you're setting one up now:** if there's no existing OTel SDK for this language yet, find and install the official one from https://opentelemetry.io/docs/languages/ (its own site — Neatlogs doesn't ship or document per-language OTel setup beyond Python/TS/Go) and add a standard gRPC trace exporter. Either way, point the exporter at Neatlogs: endpoint `ingest.neatlogs.com:443`, gRPC protocol, and the project key sent as the `x-api-key` gRPC metadata key — NOT an `Authorization: Bearer` header. Standard: emit spans following the official OpenTelemetry GenAI semantic conventions (https://opentelemetry.io/docs/specs/semconv/gen-ai/) — `gen_ai.system`, `gen_ai.request.model`, `gen_ai.operation.name`, token/usage attributes, etc. (If this happens to be a TypeScript app already using the Vercel AI SDK's own built-in `experimental_telemetry` rather than the Neatlogs SDK, its native `ai.*` attribute format — `ai.prompt`, `ai.response.text`, `ai.operationId`, etc. — is also recognized directly; no need to convert it to `gen_ai.*`.) Spans that don't follow either of these two shapes still get ingested, but arrive as generic, unparsed spans — no model name, no token counts, no LLM-specific rendering in the dashboard. Full transport detail (including the "flush before the process exits or batched spans are silently dropped" footgun): https://docs.neatlogs.com/sdk/opentelemetry.
+
+## Step 3: Follow the SDK's instrumentation reference
+
+Python, TypeScript, or Go only — skip this step if you took one of the two paths above instead.
+
+For each language, read the matching page and follow it exactly for HOW to capture LLM/framework calls — it lists, per provider and per framework, whether that one needs `wrap()`, `instrumentations=[...]`, or a dedicated integration helper, and that list changes as the SDK evolves, so don't guess or reuse a pattern from a different provider.
+
+| Language | Guide |
+| --- | ------|
+| Python | https://docs.neatlogs.com/sdk/python |
+| TypeScript | https://docs.neatlogs.com/sdk/typescript |
+| Go | https://docs.neatlogs.com/sdk/go |
+
+Use the regional Neatlogs ingest endpoint `https://ingest.neatlogs.com` for SDK initialization. Follow the language guide for the exact endpoint parameter.
+
+## Step 4: Install and initialize the SDK
+
+Python, TypeScript, or Go only — if you took the OpenTelemetry or HTTP-injection path in Step 2, follow that page's own setup instructions instead of this step.
+
+- Install the SDK using this language's own package manager (`pip`/`poetry` for Python, `npm`/`pnpm`/`yarn` for TypeScript, `go get` for Go — see Step 3's reference for the exact package/module name). Look up and install the latest version rather than pinning to a specific one. Verify the install succeeded.
+- Initialize the SDK once, near the app's entry point — the exact call signature (parameter names, casing, whether the API key is passed explicitly or read from the environment automatically) differs by language, so use Step 3's reference for the precise syntax rather than guessing from another language's example. Whatever the signature, never hardcode the API key. Set the workflow name to describe the specific task or pipeline this process runs — e.g. `invoice-ocr`, `support-agent`, `checkout-flow` — not the repo or app name; the project (selected by the API key) already identifies the app. If the repo has multiple independent entry points that each reach an LLM/agent/tool, give each its own workflow name describing what THAT one does.
+- Calling `init()` again with the same configuration is idempotent; calling it with conflicting configuration raises a configuration error until the current SDK generation is shut down. Never add a second `init()` to switch projects inside one running process. Almost every independent entry point you find stays on the same project and is distinguished by its own workflow root. Use a secondary client only when telemetry genuinely belongs to a different Neatlogs project (for example, explicit multi-tenant routing), and confirm that ownership decision with the user rather than inferring it from code structure.
+- Capture each LLM/framework call using the mechanism Step 3's reference says to use for that specific provider or framework — do not wrap something the guide says to instrument a different way, and never apply two mechanisms to the same call (e.g. `wrap()` a client AND also list it in `instrumentations=[...]`).
+- `wrap()`/`instrumentations=[...]`/framework integrations only capture library calls. Add a manual `@neatlogs.span(kind="WORKFLOW")` / `trace()` around a feature entry point only when you need to GROUP several of those calls under one named trace — not as an alternative way to capture a single call.
+
+## Rules
+
+- Add only tracing. Do not set up detections, alerts, evals, or anything else.
+- Make only the code changes needed to add tracing. Do not run the application yourself, and do not break or meaningfully modify existing code.
+- Do not use the Neatlogs wizard CLI (`npx @neatlogs/wizard@latest`) — that's a separate, more thorough path; this prompt is the manual alternative for when it isn't available.
+
+Full documentation index: https://docs.neatlogs.com/llms.txt
+
+If any framework detected in Step 2 has a dedicated skill at https://github.com/neatlogs/skills (check that repo's `skill-menu.json` for the matching package, e.g. a CrewAI or LangChain project), fetch and read it before instrumenting that framework — it carries gotcha-level detail Step 3's reference doesn't (e.g. exact span-double-firing traps, per-framework attachment rules) and is worth the extra step for that framework's correctness.
+show all
+Copy setup prompt
+back
+read the docs
+get help
+
+---
+
+give me command wha ti run or yo can also run this
+
+---
+
+done
+
+---
+
+donen
+
+---
+
+this is the project of hackathon okey
+
+---
+
+send your first trace
+waiting
+connect your app below. we'll detect the first trace live and take you in.
+
+agent prompt
+CLI
+import
+manual setup
+run this from your project root. it detects your stack, installs the SDK, and instruments it.
+
+npx @neatlogs/wizard@latest
+Copy command
+project API key
+REDACTED
+Hide
+Copy
+back
+read the docs
+
+---
+
+dekho kuch output aaya y dabne ka aya hoga

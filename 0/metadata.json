@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JWRKH8520W1XPS591VA9S9",
+  "session_id": "41b5c99f-d1b0-405a-ad05-ac911a723a83",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T12:31:49.7664705Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    ".gitignore"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "17a894eb0086",
+  "token_usage": {
+    "input_tokens": 46794,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 249073,
+    "output_tokens": 3017,
+    "api_call_count": 12
+  },
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T12:31:49.7236804Z",
+    "agent_lines": 3,
+    "agent_removed": 0,
+    "human_added": 66,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 70,
+    "total_lines_changed": 70,
+    "agent_percentage": 4.285714285714286,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 38,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "skills/neathacklogskill.txt": 38
+      }
+    }
+  ]
+}
