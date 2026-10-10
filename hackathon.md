@@ -201,6 +201,14 @@
 - **Tests Run**: Static builder widget hierarchy and semantics structure validation.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 24 — Accessible Prompt Bar Voice & State Semantics)
+- **Status**: Completed
+- **Summary**: Refined PromptBar widget integrating dynamic voice listening hint text and explicit screen reader semantics across multimodal action buttons.
+- **Completed Work**: Updated `lib/chat_page/widgets/prompt_bar.dart` (99 lines). Features public `setText` and `clear` API on `PromptBarState` for external `SpeechService` dictation binding, reactive `Listening...` vs `Ask something...` placeholder text, and explicit Semantics button wrappers for photo send, text send, dictation toggle, and TTS speech cancellation. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement main ChatPageView and settings dialog.
+- **Tests Run**: Voice text injection, cursor positioning, and action callback bindings verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
