@@ -240,6 +240,14 @@
 - **Tests Run**: kDebugMode gating and error formatting validation.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 29 — HuggingFace OAuth Token Persistence Service)
+- **Status**: Completed
+- **Summary**: Implemented `TokenManager` managing HuggingFace OAuth bearer token persistence via `SharedPreferences`.
+- **Completed Work**: Created `lib/download_page/services/token_manager.dart` (42 lines). Provides asynchronous static helpers for saving, retrieving, clearing, and probing authentication credentials, isolating auth storage from download state. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement `DownloadStateManager` service.
+- **Tests Run**: Token persistence and null check validation.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
