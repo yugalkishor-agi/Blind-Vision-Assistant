@@ -69,7 +69,7 @@ class SpeechService {
             _onStateChanged();
           }
         },
-        cancelOnError: true,
+        listenOptions: SpeechListenOptions(cancelOnError: true),
       );
     }
   }
