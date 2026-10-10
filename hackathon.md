@@ -206,7 +206,14 @@
 - **Summary**: Refined PromptBar widget integrating dynamic voice listening hint text and explicit screen reader semantics across multimodal action buttons.
 - **Completed Work**: Updated `lib/chat_page/widgets/prompt_bar.dart` (99 lines). Features public `setText` and `clear` API on `PromptBarState` for external `SpeechService` dictation binding, reactive `Listening...` vs `Ask something...` placeholder text, and explicit Semantics button wrappers for photo send, text send, dictation toggle, and TTS speech cancellation. Pushed to GitHub with Entire sync.
 - **Planned Work**: Implement main ChatPageView and settings dialog.
-- **Tests Run**: Voice text injection, cursor positioning, and action callback bindings verification.
+- **Known Issues / Failures**: None.
+
+### 2026-10-10 (Session 25 — App Bootstrap Entry Point & Background Downloader Config)
+- **Status**: Completed
+- **Summary**: Implemented application entry point in `lib/main.dart` initializing background downloader isolate messaging, WakelockPlus screen retention, and initial routing.
+- **Completed Work**: Replaced default demo app in `lib/main.dart` (35 lines). Configured `FlutterDownloader` with top-level `@pragma('vm:entry-point')` callback dispatching progress via `IsolateNameServer`, enabled `WakelockPlus` to keep device awake during 3GB model transfers, and set `ModelDownloadPage` as root home. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement `ModelDownloadPage` and download logic services.
+- **Tests Run**: Isolate entry point annotation and bootstrap sequence validation.
 - **Known Issues / Failures**: None.
 
 ## 5. Demo
@@ -223,7 +230,7 @@
   - Leverage Entire code graph for agent context and navigation.
 
 ## 7. Submission
-- **neatlogs**: Connected & Verified (Trace ID: `087efadaad69f1ba1a95d0c87e0a20ba`)
+- **neatlogs**: Connected & Verified (Trace ID: `fca335b2ea77c0a3d6656a57c6a73f1e`)
 - **Entire**: Pending
 - **cfo.ai**: N/A
 
