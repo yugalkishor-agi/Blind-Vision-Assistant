@@ -1,0 +1,20 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4JWW4TN27FCM6K20SG7SE6S",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "analysis_options.yaml",
+    "pubspec.lock",
+    "pubspec.yaml"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ]
+}
