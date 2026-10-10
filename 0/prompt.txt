@@ -1,0 +1,181 @@
+Now create 3 widget files together.
+
+  File 1: lib/chat_page/widgets/semantic_button_registry.dart
+
+  A simple registry to track accessibility-labeled buttons for screen readers. Needs a static map and clear method.
+
+  import 'package:flutter/material.dart';
+
+  class SemanticButtonRegistry {
+    static final Map<String, GlobalKey> _registry = {};
+
+    static void register(String label, GlobalKey key) {
+      _registry[label] = key;
+    }
+
+    static GlobalKey? get(String label) => _registry[label];
+
+    static void clear() => _registry.clear();
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 2: lib/chat_page/widgets/semantic_material_button.dart
+
+  An accessible button widget wrapping Semantics + Material + InkWell. Props: label, onPressed, icon, color, tooltip. Must announce itself to
+  screen readers properly.
+
+  import 'package:flutter/material.dart';
+  import 'semantic_button_registry.dart';
+
+  class SemanticMaterialButton extends StatefulWidget {
+    final String label;
+    final VoidCallback? onPressed;
+    final IconData icon;
+    final Color? color;
+    final String? tooltip;
+
+    const SemanticMaterialButton({
+      Key? key,
+      required this.label,
+      required this.icon,
+      this.onPressed,
+      this.color,
+      this.tooltip,
+    }) : super(key: key);
+
+    @override
+    State<SemanticMaterialButton> createState() => _SemanticMaterialButtonState();
+  }
+
+  class _SemanticMaterialButtonState extends State<SemanticMaterialButton> {
+    final GlobalKey _key = GlobalKey();
+
+    @override
+    void initState() {
+      super.initState();
+      SemanticButtonRegistry.register(widget.label, _key);
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Semantics(
+        label: widget.label,
+        button: true,
+        enabled: widget.onPressed != null,
+        child: Tooltip(
+          message: widget.tooltip ?? widget.label,
+          child: Material(
+            key: _key,
+            color: widget.color ?? Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: widget.onPressed,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Icon(widget.icon, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 3: lib/chat_page/widgets/chat_bubble.dart
+
+  Chat bubble widget for displaying messages. Needs to show: user vs AI styling, streaming indicator (animated dots), image thumbnail if
+  present, performance stats (token count, latency) for AI messages, markdown rendering using gpt_markdown.
+
+  import 'dart:io';
+  import 'package:flutter/material.dart';
+  import 'package:gpt_markdown/gpt_markdown.dart';
+  import '../models/message_models.dart';
+
+  class ChatBubble extends StatelessWidget {
+    final ChatMessage message;
+    const ChatBubble({Key? key, required this.message}) : super(key: key);
+
+    @override
+    Widget build(BuildContext context) {
+      final isUser = message.isUser;
+      return Padding(
+        padding: EdgeInsets.only(
+          left: isUser ? 48 : 8,
+          right: isUser ? 8 : 48,
+          top: 4, bottom: 4,
+        ),
+        child: Column(
+          crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            if (message.imagePath != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(File(message.imagePath!), height: 120, fit: BoxFit.cover),
+              ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: isUser ? const Color(0xFF4A90D9) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+              ),
+              child: message.isStreaming && message.text.isEmpty
+                  ? _StreamingDots()
+                  : Semantics(
+                      label: message.text,
+                      child: GptMarkdown(message.text),
+                    ),
+            ),
+            if (message.stats != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  '${message.stats!.tokenCount} tokens · ${message.stats!.totalLatency.toStringAsFixed(1)}s',
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+  }
+
+  class _StreamingDots extends StatefulWidget {
+    @override
+    State<_StreamingDots> createState() => _StreamingDotsState();
+  }
+
+  class _StreamingDotsState extends State<_StreamingDots> with SingleTickerProviderStateMixin {
+    late AnimationController _ctrl;
+    late Animation<double> _anim;
+
+    @override
+    void initState() {
+      super.initState();
+      _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 800))..repeat();
+      _anim = Tween(begin: 0.3, end: 1.0).animate(_ctrl);
+    }
+
+    @override
+    void dispose() { _ctrl.dispose(); super.dispose(); }
+
+    @override
+    Widget build(BuildContext context) {
+      return FadeTransition(
+        opacity: _anim,
+        child: const Text('●●●', style: TextStyle(color: Colors.grey, fontSize: 16)),
+      );
+    }
+  }
+
+  Create all 3 files. Think about why accessibility semantics matter, why streaming dots help blind users know AI is thinking, why
+  performance stats are shown.
+
+  Neatlogs instruction: Log only reasoning — why semantic labels, why animated streaming indicator for blind users, why markdown in chat
+  bubbles. No source code.
+
+  After all 3, do 2 commits each (feat + docs) and log to neatlogs.
