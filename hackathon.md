@@ -288,6 +288,14 @@
 - **Tests Run**: Progress indicator semantic announcement and button status mapping verification.
 - **Known Issues / Failures**: None.
 
+### 2026-10-10 (Session 35 — Model Download Page State Orchestration and Auto-Navigation)
+- **Status**: Completed
+- **Summary**: Implemented `ModelDownloadPage` orchestrating download lifecycle, pre-flight model check, and seamless transition to `/chat`.
+- **Completed Work**: Created `lib/download_page/model_download_page.dart` (92 lines). Probes installed model status on startup for instant bypass, subscribes to reactive download state streams, presents accessible UI controls via `DownloadUIHelpers`, and auto-navigates on download completion. Pushed to GitHub with Entire sync.
+- **Planned Work**: Implement main ChatPage and Gemma Vision view.
+- **Tests Run**: Startup file presence probe and completed stream navigation trigger verification.
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
