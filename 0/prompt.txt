@@ -1,0 +1,779 @@
+Hey, I have a skill file at this path: C:\Users\bindu\Desktop\Projects\hackathon\skills\neathacklogskill.txt
+
+  Can you read that file and tell me what rules it has — specifically around what hackathon.md should contain, which
+  three tools must be used (neatlogs, Entire, cfo.ai), and how you'll update checkpoints after each session? Just
+  confirm you understand the rules, no code yet.
+
+---
+
+I need you to create a file called hackathon.md at the project root:
+  C:\Users\bindu\Downloads\gemma-vision-master\gemma-vision-master\hackathon.md
+
+  Here's the exact content to put in it — fill it as a real hackathon submission log:
+
+  Project details to use:
+  - Name: Gemma Vision
+  - Purpose: Offline AI vision assistant for blind users using Google's Gemma 3n model
+  - Problem: Blind users have no private, offline tool to describe scenes, read text, or identify objects via voice
+  - Stack: Flutter, flutter_gemma (Gemma 3n E2B IT Int4), google_mlkit_text_recognition, flutter_tts, speech_to_text,
+  camera, flutter_downloader, HuggingFace OAuth, audioplayers, shared_preferences
+  - Team: (leave blank for now, I'll fill later)
+  - Known limitations: Requires ~3GB model download, Android only for AI features, no real-time video
+
+  Create all 7 required sections: Project, Team, Stack, Build log (today's date: 2026-10-10), Demo, Known limitations,
+  Submission.
+
+  For the Build log entry, write: "Initial project audit. App is fully functional. hackathon.md created. neatlogs,
+  Entire, and cfo.ai integrations pending."
+
+  For Submission section, mark neatlogs, Entire, cfo.ai as pending.
+
+  After creating the file, update the skill file at:
+  C:\Users\bindu\Desktop\Projects\hackathon\skills\neathacklogskill.txt — append a dated checkpoint entry: what was done
+  today, what's pending.
+
+---
+
+Hey, I'm building a Flutter app called Blind Vision Assistant — an offline AI vision app for blind users. The project
+  folder is: C:\Users\bindu\Desktop\Projects\hackathon
+
+  Before we start coding, read the skill file at: C:\Users\bindu\Desktop\Projects\hackathon\skills\neathacklogskill.txt
+
+  Understand the rules — especially:
+  - What hackathon.md must contain
+  - The 3 required tools: neatlogs, Entire, cfo.ai
+  - How to update checkpoints after each session
+
+  Confirm you understand. No code yet
+
+---
+
+Hey, I'm building a Flutter app called Blind Vision Assistant — an offline AI vision app for blind users. The project
+  folder is: C:\Users\bindu\Desktop\Projects\hackathon
+
+  Before we start coding, read the skill file at: C:\Users\bindu\Desktop\Projects\hackathon\skills\neathacklogskill.txt
+
+  Understand the rules — especially:
+  - What hackathon.md must contain
+  - The 3 required tools: neatlogs, Entire
+  - How to update checkpoints after each session
+
+  Confirm you understand. No code yet
+
+---
+
+Ok let's start. First, create the hackathon.md file at: C:\Users\bindu\Desktop\Projects\hackathon\hackathon.md
+
+  Use these exact details:
+
+  Project: Blind Vision Assistant — an offline AI vision assistant that helps blind users describe scenes, read text,
+  and identify objects using voice, with complete on-device privacy.
+
+  Team: (leave blank)
+
+  Stack: Flutter, flutter_gemma (Gemma 3n E2B IT Int4), google_mlkit_text_recognition, flutter_tts, speech_to_text,
+  camera, flutter_downloader, HuggingFace OAuth, audioplayers, shared_preferences
+
+  Build log entry (date: 2026-10-10): Project kickoff. hackathon.md created. Flutter project setup pending. neatlogs and
+  Entire integrations pending.
+
+  Known limitations: Requires ~3GB model download, Android only for AI features, no real-time video stream.
+
+  Submission: neatlogs — pending. Entire — pending. cfo.ai — N/A.
+
+  Create all 7 sections properly. After creating the file, update neatlogs with this session's input and output as a log
+  entry.
+
+---
+
+api key: REDACTED and Good. Now let's set up the Flutter project. In the folder C:\Users\bindu\Desktop\Projects\hackathon, run this command
+  and tell me the output:
+
+  flutter create . --project-name blind_vision_assistant --org com.hackathon --platforms android
+
+  Tell me:
+  1. Did it succeed?
+  2. What files were created?
+  3. Any errors?
+
+  No code changes yet, just run the command and report back. After reporting, log this interaction to neatlogs as a new
+  entry
+
+---
+
+continoue
+
+---
+
+did you update it on neatlogs?
+
+---
+
+aisa kro na ki har ek input output ko push krna (except this one)
+
+---
+
+toh ek demo push kro mai verify krta hu
+
+---
+
+done working and har thoda der me github pe push krte rhna theek hai and sara ek sath mt krn push kuch kucuh files change krna cjissey commit ki size bdhegi
+
+---
+
+Now update pubspec.yaml at C:\Users\bindu\Desktop\Projects\hackathon\pubspec.yaml — replace the dependencies section with these exact
+  packages:
+
+  dependencies:
+    flutter:
+      sdk: flutter
+    cupertino_icons: ^1.0.8
+    flutter_gemma: ^0.10.0
+    path_provider: ^2.1.5
+    flutter_tts: ^4.2.3
+    camera: ^0.11.2
+    url_launcher: ^6.3.1
+    http: ^1.4.0
+    crypto: ^3.0.6
+    flutter_web_auth_2: ^4.1.0
+    speech_to_text: ^7.2.0
+    flutter_downloader: ^1.12.0
+    permission_handler: ^11.3.0
+    gpt_markdown: ^1.1.2
+    wakelock_plus: ^1.3.2
+    audioplayers: ^6.5.0
+    shared_preferences: ^2.5.3
+    google_mlkit_text_recognition: ^0.15.0
+    remove_markdown: ^0.0.2
+
+  Also add this under the flutter: section at the bottom:
+
+    assets:
+      - assets/
+
+  After editing, run flutter pub get and paste the output. Then log this to neatlogs.
+
+---
+
+Now set up the Android configuration. Do the following 3 things:
+
+  1. In android/app/build.gradle.kts, set:
+  - minSdk = 26
+  - targetSdk = 35
+  - compileSdk = 35
+
+  2. Replace the contents of android/app/src/main/AndroidManifest.xml with permissions for camera, microphone, internet, and storage. Keep
+  the existing package name com.hackathon.blind_vision_assistant.
+
+  Required permissions to add:
+
+  <uses-permission android:name="android.permission.CAMERA"/>
+  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+  Also add android:requestLegacyExternalStorage="true" to the <application> tag.
+
+  3. In android/gradle.properties, add:
+
+  android.useAndroidX=true
+  android.enableJetifier=true
+
+  Before making changes, tell me what the current content of each of these 3 files is. Then make the changes. Then log to neatlogs.
+
+---
+
+Now create the assets folder and the core folder structure for the app. Do these steps:
+
+  1. Create this folder structure inside C:\Users\bindu\Desktop\Projects\hackathon:
+
+  assets/
+  lib/
+    chat_page/
+      config/
+      handlers/
+      models/
+      services/
+      widgets/
+    download_page/
+      config/
+      logic/
+      models/
+      services/
+      ui/
+
+  2. Create 3 placeholder audio files in assets/ — just empty files for now:
+  - assets/woosh.mp3
+  - assets/dictation_start.mp3
+  - assets/dictation_stop.mp3
+
+  3. Tell me exactly which folders and files you created.
+
+  No Dart code yet. After creating, log this to neatlogs.
+
+---
+
+Create lib/chat_page/models/message_models.dart for our vision AI chat app.
+
+  Requirements:
+  - A ChatMessage class that supports text-only and image messages
+  - Fields: text content, isUser flag, streaming state, optional image path, optional performance stats
+  - A MessageStats class with: timeToFirstToken, totalLatency, tokenCount, prefillSpeed, decodeSpeed
+  - Two factory constructors: ChatMessage.text() and ChatMessage.withImageFile()
+
+  Here's the implementation to use:
+
+  class ChatMessage {
+    String text;
+    final bool isUser;
+    bool isStreaming;
+    MessageStats? stats;
+    final String? imagePath;
+
+    ChatMessage._({
+      required this.text,
+      required this.isUser,
+      this.isStreaming = false,
+      this.stats,
+      this.imagePath,
+    });
+
+    factory ChatMessage.text(String text, {required bool isUser, bool isStreaming = false}) {
+      return ChatMessage._(text: text, isUser: isUser, isStreaming: isStreaming);
+    }
+
+    factory ChatMessage.withImageFile(String text, {required bool isUser, dynamic imageFile}) {
+      return ChatMessage._(
+        text: text,
+        isUser: isUser,
+        imagePath: imageFile?.path,
+      );
+    }
+  }
+
+  class MessageStats {
+    final double? timeToFirstToken;
+    final double totalLatency;
+    final int tokenCount;
+    final double? prefillSpeed;
+    final double? decodeSpeed;
+
+    MessageStats({
+      this.timeToFirstToken,
+      required this.totalLatency,
+      required this.tokenCount,
+      this.prefillSpeed,
+      this.decodeSpeed,
+    });
+  }
+
+  Neatlogs instruction: In the trace, log only your reasoning for the design decisions (why factory constructors, why MessageStats is
+  separate, etc.) — do not log the raw source code.
+
+  After writing, confirm file path and log to neatlogs.
+
+---
+
+Next file: lib/chat_page/config/system_prompts.dart
+
+  This file holds the AI system prompt and quick action strings for a blind user vision app. Requirements:
+  - A SystemPrompts class with only static const strings
+  - Main system prompt: tells the AI to help a blind user, be fast, give only essential information
+  - 4 quick action strings: describe room layout, tell what you see, what is this object, read all visible text
+
+  Here's the implementation:
+
+  class SystemPrompts {
+    static const String blindUserNavigation = '''
+  You are helping a blind user navigate and read text. Be FAST and USEFUL only, only write the absolute essential information. Answer
+  immediately!
+  ''';
+
+    static const String describeRoom =
+        'Describe the room layout, furniture placement, exits, and any hazards';
+
+    static const String tellMeWhatYouSee = 'Tell me what you see';
+
+    static const String whatIsThis = 'What is this?';
+
+    static const String readText = 'Read all visible text exactly as written';
+  }
+
+  Neatlogs instruction: Log only the reasoning — why a static const class, why these 4 quick actions, what problem they solve for blind
+  users. No raw source code in the trace.
+
+  After writing, confirm file path and log to neatlogs.
+
+---
+
+Next file: lib/chat_page/services/gemma_service.dart
+
+  This is the core AI service — a singleton that manages the Gemma model lifecycle. Requirements:
+  - Singleton pattern with private constructor
+  - Uses flutter_gemma package — FlutterGemmaPlugin, InferenceModel, InferenceChat
+  - init(PreferredBackend backend) method — idempotent, loads model from local path using getApplicationDocumentsDirectory(), model filename
+  is gemma-3n-E2B-it-int4.task
+  - Model config: ModelType.gemmaIt, supportImage: true, maxTokens: 8192, maxNumImages: 1
+  - Chat config: temperature: 1, topK: 64, topP: 0.95, tokenBuffer: 512
+  - sendWithStreaming() method — takes text, optional image File, onToken callback, onComplete(MessageStats) callback. Tracks performance:
+  timeToFirstToken, totalLatency, tokenCount, prefillSpeed, decodeSpeed
+  - resetChatSession() — clears history without reloading model
+  - dispose() — full cleanup
+
+  Here's the implementation:
+
+  import 'dart:async';
+  import 'dart:io';
+  import 'package:flutter_gemma/core/model.dart';
+  import 'package:flutter_gemma/flutter_gemma.dart';
+  import 'package:flutter_gemma/pigeon.g.dart';
+  import 'package:path_provider/path_provider.dart';
+  import '../models/message_models.dart';
+
+  class GemmaService {
+    GemmaService._internal();
+    static final GemmaService instance = GemmaService._internal();
+
+    final _gemma = FlutterGemmaPlugin.instance;
+    InferenceModel? _model;
+    InferenceChat? _chat;
+    bool _initialised = false;
+
+    Future<void> init(PreferredBackend backend) async {
+      if (_initialised) return;
+      final dir = await getApplicationDocumentsDirectory();
+      final path = '${dir.path}/gemma-3n-E2B-it-int4.task';
+      if (!await _gemma.modelManager.isModelInstalled && File(path).existsSync()) {
+        await _gemma.modelManager.setModelPath(path);
+      }
+      _model ??= await _gemma.createModel(
+        preferredBackend: backend,
+        modelType: ModelType.gemmaIt,
+        supportImage: true,
+        maxTokens: 8192,
+        maxNumImages: 1,
+      );
+      _chat ??= await _model!.createChat(
+        randomSeed: 1,
+        temperature: 1,
+        topK: 64,
+        topP: 0.95,
+        supportImage: true,
+        tokenBuffer: 512,
+      );
+      _initialised = true;
+    }
+
+    Future<void> sendWithStreaming({
+      required String text,
+      File? image,
+      required Function(String) onToken,
+      required Function(MessageStats) onComplete,
+    }) async {
+      if (!_initialised) throw Exception('GemmaService not initialized');
+      if (_chat == null) throw Exception('Chat not available');
+
+      final startTime = DateTime.now();
+      DateTime? firstTokenTime;
+      int tokenCount = 0;
+
+      if (image != null) {
+        final bytes = await image.readAsBytes();
+        await _chat!.addQuery(Message.withImage(text: text, imageBytes: bytes, isUser: true));
+      } else {
+        await _chat!.addQuery(Message.text(text: text, isUser: true));
+      }
+
+      final completer = Completer<void>();
+
+      _chat!.generateChatResponseAsync().listen(
+        (ModelResponse res) {
+          if (res is TextResponse) {
+            firstTokenTime ??= DateTime.now();
+            tokenCount++;
+            try { onToken(res.token); } catch (_) {}
+          }
+        },
+        onDone: () {
+          final endTime = DateTime.now();
+          final stats = MessageStats(
+            timeToFirstToken: firstTokenTime != null
+                ? firstTokenTime!.difference(startTime).inMilliseconds / 1000.0
+                : null,
+            totalLatency: endTime.difference(startTime).inMilliseconds / 1000.0,
+            tokenCount: tokenCount,
+            prefillSpeed: firstTokenTime != null && tokenCount > 0
+                ? 1000.0 / firstTokenTime!.difference(startTime).inMilliseconds
+                : null,
+            decodeSpeed: firstTokenTime != null && tokenCount > 1
+                ? (tokenCount - 1) * 1000.0 / endTime.difference(firstTokenTime!).inMilliseconds
+                : null,
+          );
+          try { onComplete(stats); } catch (_) {}
+          completer.complete();
+        },
+        onError: (error) => completer.completeError(error),
+      );
+
+      await completer.future;
+    }
+
+    Future<void> resetChatSession() async {
+      if (!_initialised) return;
+      await _chat?.clearHistory();
+    }
+
+    Future<void> dispose() async {
+      await _model?.close();
+      await _gemma.modelManager.deleteModel();
+      _model = null;
+      _chat = null;
+      _initialised = false;
+    }
+  }
+
+  Neatlogs instruction: Log only the reasoning — why singleton, why idempotent init, why streaming with callbacks, why performance stats
+  matter for on-device AI. No raw source code in the trace.
+
+  After writing, confirm file path and log to neatlogs.
+
+---
+
+t their exact paths. For each file, think about why this design makes sense for a blind user app — what problem does it
+
+---
+
+solve.
+
+  Neatlogs instruction: For each file, log only the design reasoning — why singleton for OCR, why sentence-boundary TTS streaming, why silent
+error handling in audio. No raw source code in any trace.
+
+  After all 3 files are created, do 2 commits pe:audioplayers/audioplayers.dart';
+class SoundManager {
+    final AudioPlayer _player = AudioPlayer();
+
+    Future<void> playWoosh() async {
+      try {
+        await _player.play(AssetSource('woosh.mp3'));
+      } catch (_) {}
+    }
+
+    Future<void> playDictationStart() async {
+try {
+        await _player.play(AssetSource('dictation_start.mp3'));
+      } catch (_) {}
+    }
+
+    Future<void> playDictationStop() async {
+      try {
+        await _player.play(AssetSource('dictation_stop.mp3'));
+} catch (_) {}
+    }
+
+    Future<void> dispose() async {
+      await _player.dispose();
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+File 2: lib/chat_page/services/text_recognition_service.dart
+
+  Responsibilities: Singleton OCR service using google_mlkit_text_recognition. Method extractTextFromImage(File?) returns extracted text
+  string. Initialize once, dispose properly.
+
+  import 'dart:io';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+
+  class TextRecognitionService {
+    TextRecognitionService._internal();
+    static final TextRecognitionService instance = TextRecognitionService._internal();
+late final TextRecognizer _recognizer;
+    bool _initialized = false;
+
+    Future<void> initialize() async {
+      if (_initialized) return;
+      _recognizer = TextRecognizer(script: TextRecognitionScript.latin);
+      _initialized = true;
+    }
+
+    Future<String> extractTextFromImage(File? imageFile) async {
+if (!_initialized || imageFile == null) return '';
+      try {
+        final inputImage = InputImage.fromFile(imageFile);
+        final result = await _recognizer.processImage(inputImage);
+        return result.text;
+      } catch (_) {
+        return '';
+}
+    }
+
+    Future<void> dispose() async {
+      if (_initialized) {
+        await _recognizer.close();
+        _initialized = false;
+      }
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 3: lib/chat_page/services/streaming_tts_service.dart
+Responsibilities: Streams AI tokens to TTS in real-time as they arrive. Uses flutter_tts. Tracks speaking state via ValueNotifier<bool>.
+  Methods: addText(), startLoading(), stopLoading(), onMessageComplete(), reset(), stop().
+
+  import 'package:flutter/foundation.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+
+  class StreamingTtsService {
+    final FlutterTts _tts;
+    final ValueNotifier<bool> isSpeaking = ValueNotifier(false);
+    final StringBuffer _buffer = StringBuffer();
+    bool _loading = false;
+StreamingTtsService(this._tts);
+
+    Future<void> startLoading() async {
+      _loading = true;
+      isSpeaking.value = true;
+    }
+Future<void> stopLoading() async {
+      _loading = false;
+      isSpeaking.value = false;
+    }
+
+    void addText(String token, String fullText) {
+_buffer.write(token);
+      if (token.contains(RegExp(r'[.!?]'))) {
+        _speakBuffer();
+      }
+    }
+
+    void _speakBuffer() {
+      final text = _buffer.toString().trim();
+      if (text.isNotEmpty) {
+_tts.speak(text);
+        _buffer.clear();
+      }
+    }
+
+    Future<void> onMessageComplete() async {
+      _speakBuffer();
+      _loading = false;
+    }
+
+    void reset() {
+      _buffer.clear();
+      _tts.stop();
+      isSpeaking.value = false;
+    }
+
+    void stop() {
+      reset();
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Create all 3 files at their exact paths. For each file, think about why this design makes sense for a blind user app — what problem does it
+  solve.
+
+  Neatlogs instruction: For each file, log only the design reasoning — why singleton for OCR, why sentence-boundary TTS streaming, why silent
+error handling in audio. No raw source code in any trace.
+
+  After all 3 files are created, do 2 commits per file (feat + docs) and log to neatlogs.
+
+---
+
+Now create 2 more files together — the speech service and the keyboard handler.
+
+  File 1: lib/chat_page/services/speech_service.dart
+
+  Responsibilities: Manages microphone dictation using speech_to_text package. Also handles TTS via flutter_tts. Key methods:
+  - initialize() — init speech recognition
+  - toggleDictation() — start/stop mic, play dictation sounds, fill prompt bar with recognized text
+  - handleFocusKey() — keyboard event handler for F1/F2 shortcuts
+  - speak(String text) — direct TTS
+  - stopTts() — stop speaking
+  - announceMessageType(bool hasImage) — announce "photo message" or "text message"
+  - playWooshSound() — delegates to SoundManager
+  - State: speechEnabled, listening booleans
+
+  import 'dart:async';
+  import 'package:flutter/services.dart';
+  import 'package:flutter/widgets.dart';
+  import 'package:flutter_tts/flutter_tts.dart';
+  import 'package:speech_to_text/speech_to_text.dart';
+  import '../widgets/prompt_bar.dart';
+  import 'sound_manager.dart';
+
+  class SpeechService {
+    final FlutterTts _tts;
+    final SpeechToText _stt = SpeechToText();
+    final SoundManager _sounds = SoundManager();
+    final GlobalKey<PromptBarState> _promptBarKey;
+    final VoidCallback _onStateChanged;
+    Function() _isGenerating;
+
+    bool speechEnabled = false;
+    bool listening = false;
+
+    SpeechService({
+      required FlutterTts tts,
+      required VoidCallback onStateChanged,
+      required GlobalKey<PromptBarState> promptBarKey,
+      required Function() isGenerating,
+    })  : _tts = tts,
+          _onStateChanged = onStateChanged,
+          _promptBarKey = promptBarKey,
+          _isGenerating = isGenerating;
+
+    void updateIsGeneratingCallback(Function() cb) => _isGenerating = cb;
+
+    Future<void> initialize() async {
+      speechEnabled = await _stt.initialize();
+      _onStateChanged();
+    }
+
+    Future<void> speak(String text) async {
+      await _tts.speak(text);
+    }
+
+    Future<void> stopTts() async {
+      await _tts.stop();
+    }
+
+    Future<void> playWooshSound() async {
+      await _sounds.playWoosh();
+    }
+
+    Future<void> announceMessageType(bool hasImage) async {
+      await _tts.speak(hasImage ? 'Photo message' : 'Text message');
+    }
+
+    Future<void> toggleDictation() async {
+      if (!speechEnabled) return;
+      if (listening) {
+        await _stt.stop();
+        await _sounds.playDictationStop();
+        listening = false;
+        _onStateChanged();
+      } else {
+        await _sounds.playDictationStart();
+        listening = true;
+        _onStateChanged();
+        await _stt.listen(
+          onResult: (result) {
+            if (result.finalResult) {
+              _promptBarKey.currentState?.setText(result.recognizedWords);
+              listening = false;
+              _onStateChanged();
+            }
+          },
+          cancelOnError: true,
+        );
+      }
+    }
+
+    KeyEventResult handleFocusKey(FocusNode node, KeyEvent event) {
+      if (event is KeyDownEvent) {
+        if (event.logicalKey == LogicalKeyboardKey.f2) {
+          toggleDictation();
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    }
+
+    void dispose() {
+      _stt.cancel();
+      _sounds.dispose();
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 2: lib/chat_page/handlers/keyboard_handler.dart
+
+  Responsibilities: Maps keyboard shortcuts to app actions using Flutter Shortcuts + Actions system. Shortcuts:
+  - F1 → toggle messages
+  - F2 → toggle voice
+  - F3 → new chat
+  - F4 → settings
+  - F5 → quick action 1 (describe room)
+  - F6 → quick action 2 (what do you see)
+  - F7 → quick action 3 (what is this)
+  - F8 → quick action 4 (read text)
+
+  import 'package:flutter/material.dart';
+  import 'package:flutter/services.dart';
+  import '../widgets/prompt_bar.dart';
+
+  class _ActionIntent extends Intent {
+    const _ActionIntent(this.key);
+    final LogicalKeyboardKey key;
+  }
+
+  class KeyboardHandler {
+    final BuildContext context;
+    final GlobalKey<PromptBarState> promptBarKey;
+    final VoidCallback onToggleMessages;
+    final VoidCallback onToggleCamera;
+    final VoidCallback onToggleSettings;
+    final Future<void> Function() onNewChat;
+    final Future<void> Function() onQuickAction1;
+    final Future<void> Function() onQuickAction2;
+    final Future<void> Function() onQuickAction3;
+    final Future<void> Function() onQuickAction4;
+    final VoidCallback onToggleVoice;
+
+    KeyboardHandler({
+      required this.context,
+      required this.promptBarKey,
+      required this.onToggleMessages,
+      required this.onToggleCamera,
+      required this.onToggleSettings,
+      required this.onNewChat,
+      required this.onQuickAction1,
+      required this.onQuickAction2,
+      required this.onQuickAction3,
+      required this.onQuickAction4,
+      required this.onToggleVoice,
+    });
+
+    Map<ShortcutActivator, Intent> get shortcuts => {
+      SingleActivator(LogicalKeyboardKey.f1): const _ActionIntent(LogicalKeyboardKey.f1),
+      SingleActivator(LogicalKeyboardKey.f2): const _ActionIntent(LogicalKeyboardKey.f2),
+      SingleActivator(LogicalKeyboardKey.f3): const _ActionIntent(LogicalKeyboardKey.f3),
+      SingleActivator(LogicalKeyboardKey.f4): const _ActionIntent(LogicalKeyboardKey.f4),
+      SingleActivator(LogicalKeyboardKey.f5): const _ActionIntent(LogicalKeyboardKey.f5),
+      SingleActivator(LogicalKeyboardKey.f6): const _ActionIntent(LogicalKeyboardKey.f6),
+      SingleActivator(LogicalKeyboardKey.f7): const _ActionIntent(LogicalKeyboardKey.f7),
+      SingleActivator(LogicalKeyboardKey.f8): const _ActionIntent(LogicalKeyboardKey.f8),
+    };
+
+    Map<Type, Action<Intent>> get actions => {
+      _ActionIntent: CallbackAction<_ActionIntent>(
+        onInvoke: (intent) {
+          if (intent.key == LogicalKeyboardKey.f1) onToggleMessages();
+          if (intent.key == LogicalKeyboardKey.f2) onToggleVoice();
+          if (intent.key == LogicalKeyboardKey.f3) onNewChat();
+          if (intent.key == LogicalKeyboardKey.f4) onToggleSettings();
+          if (intent.key == LogicalKeyboardKey.f5) onQuickAction1();
+          if (intent.key == LogicalKeyboardKey.f6) onQuickAction2();
+          if (intent.key == LogicalKeyboardKey.f7) onQuickAction3();
+          if (intent.key == LogicalKeyboardKey.f8) onQuickAction4();
+          return null;
+        },
+      ),
+    };
+  }
+
+  Create both files at their exact paths. Think about why keyboard shortcuts matter for a blind user app, and why speech service needs to
+  coordinate sound cues with dictation state.
+
+  Neatlogs instruction: Log only the accessibility reasoning for each file — why F-key shortcuts, why dictation state machine, why sound cues
+  coordinate with speech. No raw source code.
+
+  After both files, do 2 commits each (feat + docs) and log to neatlogs.
