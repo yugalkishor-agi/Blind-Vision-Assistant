@@ -1,0 +1,212 @@
+Now create 2 final download page files — the UI helpers and the main download page.
+
+  File 1: lib/download_page/ui/ui_helpers.dart
+
+  Simple UI helper widgets for the download page — progress indicator, status text, action buttons:
+
+  import 'package:flutter/material.dart';
+  import '../models/enums.dart';
+
+  class DownloadUIHelpers {
+    static String getStatusText(DownloadStatus status, int progress) {
+      switch (status) {
+        case DownloadStatus.notStarted: return 'Ready to download';
+        case DownloadStatus.downloading: return 'Downloading... $progress%';
+        case DownloadStatus.paused: return 'Paused at $progress%';
+        case DownloadStatus.completed: return 'Download complete';
+        case DownloadStatus.failed: return 'Download failed';
+        case DownloadStatus.cancelled: return 'Download cancelled';
+      }
+    }
+
+    static Color getStatusColor(DownloadStatus status) {
+      switch (status) {
+        case DownloadStatus.completed: return Colors.green;
+        case DownloadStatus.failed: return Colors.red;
+        case DownloadStatus.downloading: return Colors.blue;
+        case DownloadStatus.paused: return Colors.orange;
+        default: return Colors.grey;
+      }
+    }
+
+    static Widget buildProgressSection(DownloadStatus status, int progress) {
+      return Column(
+        children: [
+          Semantics(
+            label: getStatusText(status, progress),
+            child: LinearProgressIndicator(
+              value: status == DownloadStatus.downloading || status == DownloadStatus.paused
+                  ? progress / 100.0 : null,
+              backgroundColor: Colors.grey.shade200,
+              valueColor: AlwaysStoppedAnimation(getStatusColor(status)),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(getStatusText(status, progress),
+              style: TextStyle(color: getStatusColor(status), fontWeight: FontWeight.w500)),
+        ],
+      );
+    }
+
+    static Widget buildActionButton({
+      required DownloadStatus status,
+      required VoidCallback onStart,
+      required VoidCallback onPause,
+      required VoidCallback onResume,
+      required VoidCallback onCancel,
+    }) {
+      switch (status) {
+        case DownloadStatus.notStarted:
+        case DownloadStatus.failed:
+        case DownloadStatus.cancelled:
+          return Semantics(
+            label: 'Download AI model',
+            button: true,
+            child: ElevatedButton.icon(
+              onPressed: onStart,
+              icon: const Icon(Icons.download),
+              label: const Text('Download Model (~3GB)'),
+            ),
+          );
+        case DownloadStatus.downloading:
+          return Semantics(
+            label: 'Pause download',
+            button: true,
+            child: ElevatedButton.icon(
+              onPressed: onPause,
+              icon: const Icon(Icons.pause),
+              label: const Text('Pause'),
+            ),
+          );
+        case DownloadStatus.paused:
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Semantics(label: 'Resume download', button: true,
+                child: ElevatedButton.icon(onPressed: onResume,
+                  icon: const Icon(Icons.play_arrow), label: const Text('Resume'))),
+              const SizedBox(width: 12),
+              Semantics(label: 'Cancel download', button: true,
+                child: OutlinedButton.icon(onPressed: onCancel,
+                  icon: const Icon(Icons.cancel), label: const Text('Cancel'))),
+            ],
+          );
+        case DownloadStatus.completed:
+          return Semantics(
+            label: 'Open Blind Vision Assistant',
+            button: true,
+            child: ElevatedButton.icon(
+              onPressed: onStart,
+              icon: const Icon(Icons.visibility),
+              label: const Text('Open App'),
+            ),
+          );
+      }
+    }
+  }
+
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  File 2: lib/download_page/model_download_page.dart
+
+  Main download page StatefulWidget — orchestrates DownloadManager + DownloadLogic, shows progress, handles all download states:
+
+  import 'package:flutter/material.dart';
+  import 'config/constants.dart';
+  import 'logic/download_logic.dart';
+  import 'models/enums.dart';
+  import 'models/models.dart';
+  import 'services/download_manager.dart';
+  import 'ui/ui_helpers.dart';
+  import '../chat_page/gemma_vision_chat.dart';
+
+  class ModelDownloadPage extends StatefulWidget {
+    const ModelDownloadPage({Key? key}) : super(key: key);
+
+    @override
+    State<ModelDownloadPage> createState() => _ModelDownloadPageState();
+  }
+
+  class _ModelDownloadPageState extends State<ModelDownloadPage> {
+    late DownloadManager _downloadManager;
+    late DownloadLogic _downloadLogic;
+    DownloadState _state = const DownloadState();
+
+    @override
+    void initState() {
+      super.initState();
+      _downloadManager = DownloadManager();
+      _downloadManager.initialize().then((_) {
+        _downloadLogic = DownloadLogic(manager: _downloadManager, context: context);
+        _downloadLogic.stateStream.listen((state) {
+          if (mounted) {
+            setState(() => _state = state);
+            if (state.status == DownloadStatus.completed) _navigateToChat();
+          }
+        });
+        setState(() => _state = _downloadManager.currentState);
+        _downloadLogic.isModelInstalled().then((installed) {
+          if (installed && mounted) _navigateToChat();
+        });
+      });
+    }
+
+    void _navigateToChat() {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const ChatPage()),
+      );
+    }
+
+    @override
+    void dispose() {
+      _downloadManager.dispose();
+      super.dispose();
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.visibility, size: 64, color: Color(0xFF4A90D9)),
+                const SizedBox(height: 16),
+                const Text('Blind Vision Assistant',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(modelFullName,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                const SizedBox(height: 32),
+                DownloadUIHelpers.buildProgressSection(_state.status, _state.progress),
+                const SizedBox(height: 24),
+                DownloadUIHelpers.buildActionButton(
+                  status: _state.status,
+                  onStart: _downloadLogic.startOrResumeDownload,
+                  onPause: _downloadLogic.pauseDownload,
+                  onResume: _downloadLogic.startOrResumeDownload,
+                  onCancel: _downloadLogic.cancelDownload,
+                ),
+                if (_state.errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(_state.errorMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 12)),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  Create both files. Think about why UI helpers are static methods, why model download page checks for existing model on init, why navigation
+  happens automatically on completion.
+
+  Neatlogs instruction: Log only reasoning — why static UI helpers, why auto-navigate on completion, why Semantics on every download button.
+  No source code.
+
+  After both, do 2 commits each (feat + docs) and log to neatlogs.
