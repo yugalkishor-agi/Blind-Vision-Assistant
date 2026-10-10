@@ -5,12 +5,12 @@ class PromptBar extends StatefulWidget {
   final bool disabled, speechEnabled, listening, isGenerating, isSpeaking;
   final VoidCallback onToggleListening, onStopTts;
   const PromptBar({
-    Key? key,
+    super.key,
     required this.onPromptWithPhoto, required this.onPromptTextOnly,
     required this.disabled, required this.speechEnabled, required this.listening,
     required this.onToggleListening, required this.isGenerating,
     required this.isSpeaking, required this.onStopTts,
-  }) : super(key: key);
+  });
 
   @override State<PromptBar> createState() => PromptBarState();
 }

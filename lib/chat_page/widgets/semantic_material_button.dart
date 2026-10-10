@@ -9,13 +9,13 @@ class SemanticMaterialButton extends StatefulWidget {
   final String? tooltip;
 
   const SemanticMaterialButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.icon,
     this.onPressed,
     this.color,
     this.tooltip,
-  }) : super(key: key);
+  });
 
   @override
   State<SemanticMaterialButton> createState() => _SemanticMaterialButtonState();

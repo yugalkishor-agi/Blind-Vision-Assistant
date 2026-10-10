@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ErrorRecoveryPage extends StatelessWidget {
-  const ErrorRecoveryPage({Key? key}) : super(key: key);
+  const ErrorRecoveryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
