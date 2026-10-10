@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4K4RB4AMT8BZ5KVMF6158T8",
+  "session_id": "6e91cb54-8124-467f-bc8b-0788c29f5717",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T14:51:29.344823Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "lib/download_page/model_download_page.dart"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "9e08bd858f5c",
+  "session_metrics": {
+    "turn_count": 25
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-10T14:51:29.1713158Z",
+    "agent_lines": 91,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 91,
+    "total_lines_changed": 91,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
