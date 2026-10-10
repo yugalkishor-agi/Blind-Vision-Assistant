@@ -1,0 +1,132 @@
+Create lib/chat_page/widgets/prompt_bar.dart.
+
+  I need a StatefulWidget called PromptBar with a public state class PromptBarState that exposes two public methods: setText(String text) to
+  fill the input from voice dictation, and clear() to reset it. Props needed: onPromptWithPhoto, onPromptTextOnly, disabled, speechEnabled,
+  listening, onToggleListening, isGenerating, isSpeaking, onStopTts. UI: text field + camera send button + text-only send button + mic button
+  + stop TTS button. Every button must have explicit Semantics label for screen readers.
+
+  import 'package:flutter/material.dart';
+
+  class PromptBar extends StatefulWidget {
+    final Future<void> Function(String) onPromptWithPhoto;
+    final Future<void> Function(String) onPromptTextOnly;
+    final bool disabled;
+    final bool speechEnabled;
+    final bool listening;
+    final VoidCallback onToggleListening;
+    final bool isGenerating;
+    final bool isSpeaking;
+    final VoidCallback onStopTts;
+
+    const PromptBar({
+      Key? key,
+      required this.onPromptWithPhoto,
+      required this.onPromptTextOnly,
+      required this.disabled,
+      required this.speechEnabled,
+      required this.listening,
+      required this.onToggleListening,
+      required this.isGenerating,
+      required this.isSpeaking,
+      required this.onStopTts,
+    }) : super(key: key);
+
+    @override
+    State<PromptBar> createState() => PromptBarState();
+  }
+
+  class PromptBarState extends State<PromptBar> {
+    final _controller = TextEditingController();
+
+    void setText(String text) {
+      _controller.text = text;
+      _controller.selection = TextSelection.fromPosition(TextPosition(offset: text.length));
+    }
+
+    void clear() => _controller.clear();
+
+    Future<void> _sendWithPhoto() async {
+      final text = _controller.text.trim();
+      if (text.isEmpty || widget.disabled) return;
+      _controller.clear();
+      await widget.onPromptWithPhoto(text);
+    }
+
+    Future<void> _sendTextOnly() async {
+      final text = _controller.text.trim();
+      if (text.isEmpty || widget.disabled) return;
+      _controller.clear();
+      await widget.onPromptTextOnly(text);
+    }
+
+    @override
+    void dispose() { _controller.dispose(); super.dispose(); }
+
+    @override
+    Widget build(BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2))],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                label: 'Message input',
+                child: TextField(
+                  controller: _controller,
+                  enabled: !widget.disabled,
+                  decoration: InputDecoration(
+                    hintText: widget.listening ? 'Listening...' : 'Ask something...',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  onSubmitted: (_) => _sendWithPhoto(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            if (widget.isSpeaking)
+              Semantics(
+                label: 'Stop speaking',
+                button: true,
+                child: IconButton(icon: const Icon(Icons.stop_circle, color: Colors.red), onPressed: widget.onStopTts),
+              ),
+            if (widget.speechEnabled)
+              Semantics(
+                label: widget.listening ? 'Stop listening' : 'Start voice input',
+                button: true,
+                child: IconButton(
+                  icon: Icon(widget.listening ? Icons.mic_off : Icons.mic,
+                      color: widget.listening ? Colors.red : Colors.grey),
+                  onPressed: widget.disabled ? null : widget.onToggleListening,
+                ),
+              ),
+            Semantics(
+              label: 'Send with photo',
+              button: true,
+              child: IconButton(
+                icon: const Icon(Icons.camera_alt, color: Color(0xFF4A90D9)),
+                onPressed: widget.disabled ? null : _sendWithPhoto,
+              ),
+            ),
+            Semantics(
+              label: 'Send text only',
+              button: true,
+              child: IconButton(
+                icon: const Icon(Icons.send, color: Color(0xFF4A90D9)),
+                onPressed: widget.disabled ? null : _sendTextOnly,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Neatlogs instruction: Log only reasoning — why public setText/clear methods are needed, why every button has explicit Semantics, why
+  listening state changes hint text. No source code in trace.
+
+  After creating, do 2 commits (feat + docs) and log to neatlogs.
