@@ -1,0 +1,29 @@
+Next file: lib/chat_page/config/system_prompts.dart
+
+  This file holds the AI system prompt and quick action strings for a blind user vision app. Requirements:
+  - A SystemPrompts class with only static const strings
+  - Main system prompt: tells the AI to help a blind user, be fast, give only essential information
+  - 4 quick action strings: describe room layout, tell what you see, what is this object, read all visible text
+
+  Here's the implementation:
+
+  class SystemPrompts {
+    static const String blindUserNavigation = '''
+  You are helping a blind user navigate and read text. Be FAST and USEFUL only, only write the absolute essential information. Answer
+  immediately!
+  ''';
+
+    static const String describeRoom =
+        'Describe the room layout, furniture placement, exits, and any hazards';
+
+    static const String tellMeWhatYouSee = 'Tell me what you see';
+
+    static const String whatIsThis = 'What is this?';
+
+    static const String readText = 'Read all visible text exactly as written';
+  }
+
+  Neatlogs instruction: Log only the reasoning — why a static const class, why these 4 quick actions, what problem they solve for blind
+  users. No raw source code in the trace.
+
+  After writing, confirm file path and log to neatlogs.
