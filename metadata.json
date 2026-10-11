@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4N6J19BG5SXTCEYC14G74QX",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "hackathon.md",
+    "skills/upload_deep_detailed_traces.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 35296,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3063094,
+    "output_tokens": 13717,
+    "api_call_count": 44
+  }
+}
