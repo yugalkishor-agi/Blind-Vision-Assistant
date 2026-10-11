@@ -84,14 +84,8 @@ class SpeechService {
   /// Use system accessibility announcements for brief notifications
   void _announce(String message) {
     if (message.isEmpty) return;
-    debugPrint('supported: ${SemanticsService.isAnnounceSupported()}');
-    if (Platform.isAndroid) {
-      SemanticsService.isAnnounceSupported()
-          ? SemanticsService.announce(message, ui.TextDirection.ltr)
-          : _tts.speak(message);
-    } else {
-      _tts.speak(message);
-    }
+  _tts.speak(message);
+}
   }
 
   /* Voice dictation functionality */
