@@ -1,4 +1,6 @@
 // lib/chat_page/widgets/chat_ui_builder.dart
+// ── BRUTALIST EDITORIAL DESIGN ──────────────────────────────────────────────
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/message_models.dart';
@@ -6,24 +8,16 @@ import 'chat_bubble.dart';
 import 'prompt_bar.dart';
 import 'semantic_material_button.dart';
 
-// ─── Design tokens (mirrors main.dart / modern_ui_widgets) ───────────────────
-class _C {
-  static const bg        = Color(0xFF0A0A14);
-  static const surface   = Color(0xFF12121E);
-  static const surface2  = Color(0xFF1A1A2E);
-  static const border    = Color(0xFF2D2D3F);
-  static const violet    = Color(0xFF7C3AED);
-  static const cyan      = Color(0xFF06B6D4);
-  static const pink      = Color(0xFFEC4899);
-  static const green     = Color(0xFF10B981);
-  static const amber     = Color(0xFFF59E0B);
-  static const textHi    = Color(0xFFF1F5F9);
-  static const textMid   = Color(0xFF94A3B8);
-  static const textLo    = Color(0xFF475569);
-}
+// ─── Tokens ─────────────────────────────────────────────────────────────────
+const _cream  = Color(0xFFF5F0E8);
+const _ink    = Color(0xFF1A1A1A);
+const _inkSoft= Color(0xFF3A3530);
+const _inkMute= Color(0xFF888070);
+const _accent = Color(0xFFE8441A);
+const _paper  = Color(0xFFEDE8DF);
+const _borderW= 2.0;
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Static UI builder for chat interface components with accessibility integration
 class ChatUIBuilder {
 
   // ── App bar ────────────────────────────────────────────────────────────────
@@ -35,117 +29,91 @@ class ChatUIBuilder {
     return AppBar(
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: _C.bg,
-      systemOverlayStyle: SystemUiOverlayStyle.light,
-      title: Row(
+      backgroundColor: _cream,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      titleSpacing: 24,
+      title: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Logo glyph
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [_C.violet, _C.cyan],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(9),
-            ),
-            child: const Icon(Icons.visibility_rounded, color: Colors.white, size: 16),
+          Text(
+            'BLIND VISION',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: _ink, letterSpacing: 2.0),
           ),
-          const SizedBox(width: 10),
-          const Text(
-            'Gemma Vision',
-            style: TextStyle(
-              color: _C.textHi,
-              fontSize: 19,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.4,
-            ),
+          Text(
+            'ASSISTANT',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: _accent, letterSpacing: 2.0),
           ),
         ],
       ),
       actions: [
-        // Settings button
         SemanticMaterialButton(
           label: 'Settings',
           hint: 'Double-tap to open settings page',
           onPressed: onToggleSettings,
           child: Container(
             margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: _C.surface2,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _C.border),
+              color: _cream,
+              border: Border.all(color: _ink, width: _borderW),
+              boxShadow: const [BoxShadow(color: _ink, offset: Offset(2, 2), blurRadius: 0)],
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.tune_rounded, size: 15, color: _C.textMid),
-                SizedBox(width: 5),
-                Text(
-                  'Settings',
-                  style: TextStyle(
-                    color: _C.textMid,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    letterSpacing: 0.1,
-                  ),
-                ),
-              ],
+            child: const Text(
+              'SETTINGS',
+              style: TextStyle(
+                fontSize: 10, fontWeight: FontWeight.w900,
+                color: _ink, letterSpacing: 1.5, fontFamily: 'monospace',
+              ),
             ),
           ),
         ),
       ],
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: _C.border),
+        preferredSize: const Size.fromHeight(2),
+        child: Container(height: 2, color: _ink),
       ),
     );
   }
 
-  // ── View toggle buttons ────────────────────────────────────────────────────
+  // ── Toggle buttons ─────────────────────────────────────────────────────────
   static Widget buildViewToggleButtons({
     required bool showMessages,
     required VoidCallback onToggleMessages,
     required VoidCallback onNewChat,
     required bool isResetting,
   }) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+    return Container(
+      decoration: const BoxDecoration(
+        color: _cream,
+        border: Border(bottom: BorderSide(color: _ink, width: _borderW)),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       child: FocusTraversalGroup(
         policy: WidgetOrderTraversalPolicy(),
         child: Row(
           children: [
             Expanded(
-              child: _buildToggleButton(
-                icon: Icons.add_circle_outline_rounded,
-                label: 'New Chat',
-                hint: isResetting
-                    ? 'New chat is currently processing'
-                    : 'Double-tap to start a new chat conversation',
-                isActive: true,
-                primaryColor: _C.green,
+              child: _buildToggleBtn(
+                label: 'NEW CHAT',
+                isActive: false,
+                useAccent: false,
+                hint: isResetting ? 'Processing…' : 'Double-tap to start a new chat',
                 onPressed: isResetting ? null : onNewChat,
                 disabled: isResetting,
+                icon: Icons.add_rounded,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
-              child: _buildToggleButton(
-                icon: showMessages
-                    ? Icons.chat_bubble_rounded
-                    : Icons.chat_bubble_outline_rounded,
-                label: showMessages ? 'Hide Messages' : 'Show Messages',
-                hint: showMessages
-                    ? 'Double-tap to hide the conversation messages'
-                    : 'Double-tap to show the conversation messages',
+              child: _buildToggleBtn(
+                label: showMessages ? 'HIDE MSGS' : 'SHOW MSGS',
                 isActive: showMessages,
-                primaryColor: _C.violet,
+                useAccent: showMessages,
+                hint: showMessages ? 'Double-tap to hide messages' : 'Double-tap to show messages',
                 onPressed: onToggleMessages,
                 disabled: false,
+                icon: showMessages ? Icons.chat_bubble_rounded : Icons.chat_bubble_outline_rounded,
               ),
             ),
           ],
@@ -154,28 +122,21 @@ class ChatUIBuilder {
     );
   }
 
-  static Widget _buildToggleButton({
-    required IconData icon,
+  static Widget _buildToggleBtn({
     required String label,
     required bool isActive,
-    required Color primaryColor,
+    required bool useAccent,
     required VoidCallback? onPressed,
     required String hint,
+    required IconData icon,
     bool disabled = false,
   }) {
-    Color bgColor;
-    Color fgColor;
-
-    if (disabled) {
-      bgColor = _C.surface2;
-      fgColor = _C.textLo;
-    } else if (isActive) {
-      bgColor = primaryColor;
-      fgColor = Colors.white;
-    } else {
-      bgColor = _C.surface;
-      fgColor = primaryColor;
-    }
+    final bg = disabled ? const Color(0xFFD8D3CA)
+        : useAccent ? _accent
+        : _cream;
+    final fg = disabled ? _inkMute
+        : useAccent ? _cream
+        : _ink;
 
     return SemanticMaterialButton(
       label: label,
@@ -183,37 +144,26 @@ class ChatUIBuilder {
       onPressed: disabled ? null : onPressed,
       disabled: disabled,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOut,
-        height: 48,
+        duration: const Duration(milliseconds: 180),
+        height: 42,
         decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isActive && !disabled ? primaryColor.withOpacity(0.4) : _C.border,
-          ),
-          boxShadow: isActive && !disabled
-              ? [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.25),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  )
-                ]
+          color: bg,
+          border: Border.all(color: disabled ? const Color(0xFFB0AB9E) : _ink, width: _borderW),
+          boxShadow: !disabled && !useAccent
+              ? const [BoxShadow(color: _ink, offset: Offset(2, 2), blurRadius: 0)]
               : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: fgColor, size: 17),
-            const SizedBox(width: 7),
+            Icon(icon, color: fg, size: 14),
+            const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: fgColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                letterSpacing: 0.1,
+                color: fg, fontSize: 10,
+                fontWeight: FontWeight.w900, letterSpacing: 1.2,
+                fontFamily: 'monospace',
               ),
             ),
           ],
@@ -228,20 +178,23 @@ class ChatUIBuilder {
     ScrollController scrollController,
   ) {
     return Expanded(
-      child: Semantics(
-        label: 'Chat messages',
-        hint: 'Swipe to scroll through conversation history',
-        child: ListView.builder(
-          controller: scrollController,
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          itemCount: messages.length,
-          semanticChildCount: messages.length,
-          itemBuilder: (_, i) => Semantics(
-            label: messages[i].isUser
-                ? 'Your message ${i + 1} of ${messages.length}'
-                : 'AI response ${i + 1} of ${messages.length}',
-            child: ChatBubble(msg: messages[i]),
+      child: ColoredBox(
+        color: _cream,
+        child: Semantics(
+          label: 'Chat messages',
+          hint: 'Swipe to scroll through conversation history',
+          child: ListView.builder(
+            controller: scrollController,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            itemCount: messages.length,
+            semanticChildCount: messages.length,
+            itemBuilder: (_, i) => Semantics(
+              label: messages[i].isUser
+                  ? 'Your message ${i + 1} of ${messages.length}'
+                  : 'AI response ${i + 1} of ${messages.length}',
+              child: ChatBubble(msg: messages[i]),
+            ),
           ),
         ),
       ),
@@ -266,10 +219,7 @@ class ChatUIBuilder {
     }
 
     return Container(
-      decoration: const BoxDecoration(
-        color: _C.bg,
-        border: Border(top: BorderSide(color: _C.border)),
-      ),
+      color: _cream,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: PromptBar(
         key: promptBarKey,
@@ -284,7 +234,7 @@ class ChatUIBuilder {
     );
   }
 
-  // ── Status widget (generating / speaking) ─────────────────────────────────
+  // ── Generating / speaking status bar ──────────────────────────────────────
   static Widget _buildStatusWidget({
     required bool isGenerating,
     required bool isSpeaking,
@@ -292,44 +242,30 @@ class ChatUIBuilder {
     final label = isGenerating
         ? (isSpeaking ? 'Generating response and speaking' : 'Generating response')
         : 'Speaking response';
-
-    final displayText = isGenerating
-        ? (isSpeaking ? 'Generating & Speaking…' : 'Generating Response…')
-        : 'Speaking…';
+    final text = isGenerating
+        ? (isSpeaking ? 'GENERATING + SPEAKING…' : 'GENERATING…')
+        : 'SPEAKING…';
 
     return Container(
-      height: 76,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: _C.bg,
-        border: const Border(top: BorderSide(color: _C.border)),
+      height: 70,
+      decoration: const BoxDecoration(
+        color: _accent,
+        border: Border(top: BorderSide(color: _ink, width: _borderW)),
       ),
       child: Semantics(
         label: label,
         hint: 'Please wait while the AI processes your request',
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [_C.violet.withOpacity(0.18), _C.cyan.withOpacity(0.12)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: _C.violet.withOpacity(0.3)),
-          ),
           child: Row(
             children: [
-              // Animated dots indicator
               _ThinkingDots(),
               const SizedBox(width: 14),
               Text(
-                displayText,
+                text,
                 style: const TextStyle(
-                  color: _C.textHi,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
+                  color: _cream, fontWeight: FontWeight.w900,
+                  fontSize: 13, letterSpacing: 1.5, fontFamily: 'monospace',
                 ),
               ),
             ],
@@ -341,94 +277,150 @@ class ChatUIBuilder {
 
   // ── Loading screen ─────────────────────────────────────────────────────────
   static Widget buildLoadingScreen() {
-    return Scaffold(
-      backgroundColor: _C.bg,
-      body: Stack(
-        children: [
-          // Ambient glow
-          Positioned(
-            top: -100,
-            left: -80,
-            child: Container(
-              width: 320,
-              height: 320,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [_C.violet.withOpacity(0.2), Colors.transparent],
-                ),
-              ),
-            ),
+    return const Scaffold(
+      backgroundColor: _cream,
+      body: _LoadingBody(),
+    );
+  }
+}
+
+// ─── Internal widgets ─────────────────────────────────────────────────────────
+
+class _LoadingBody extends StatefulWidget {
+  const _LoadingBody();
+  @override
+  State<_LoadingBody> createState() => _LoadingBodyState();
+}
+class _LoadingBodyState extends State<_LoadingBody> with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _blink;
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(duration: const Duration(milliseconds: 800), vsync: this)..repeat(reverse: true);
+    _blink = Tween<double>(begin: 0.2, end: 1.0).animate(_ctrl);
+  }
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Top bar
+        Container(
+          height: 56,
+          decoration: const BoxDecoration(
+            color: _cream,
+            border: Border(bottom: BorderSide(color: _ink, width: 2)),
           ),
-          Positioned(
-            bottom: -80,
-            right: -60,
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [_C.cyan.withOpacity(0.15), Colors.transparent],
-                ),
-              ),
-            ),
-          ),
-          const Center(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: const Align(
+            alignment: Alignment.centerLeft,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo
-                _LoadingLogo(),
-                SizedBox(height: 36),
-                Text(
-                  'Initializing Gemma',
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: _C.textHi,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.4,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Preparing your AI vision assistant…',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: _C.textMid,
-                  ),
-                ),
+                Text('BLIND VISION', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: _ink, letterSpacing: 2)),
+                Text('ASSISTANT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: _accent, letterSpacing: 2)),
               ],
             ),
           ),
-        ],
+        ),
+        const Expanded(
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'INITIALIZING —',
+                    style: TextStyle(
+                      fontFamily: 'monospace', fontSize: 11,
+                      color: _accent, fontWeight: FontWeight.w700, letterSpacing: 1.0,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Loading\nGemma.',
+                    style: TextStyle(
+                      fontSize: 48, fontWeight: FontWeight.w900,
+                      color: _ink, height: 0.95, letterSpacing: -2,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  _LoadingBar(),
+                  SizedBox(height: 16),
+                  Text(
+                    'Preparing your AI vision assistant.\nThis takes a moment.',
+                    style: TextStyle(
+                      fontSize: 13, fontFamily: 'monospace',
+                      color: _inkSoft, height: 1.6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LoadingBar extends StatefulWidget {
+  const _LoadingBar();
+  @override
+  State<_LoadingBar> createState() => _LoadingBarState();
+}
+class _LoadingBarState extends State<_LoadingBar> with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(duration: const Duration(seconds: 2), vsync: this)..repeat();
+  }
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 12,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: _paper,
+        border: Border.all(color: _ink, width: 2),
+      ),
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, __) {
+          return FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: _ctrl.value,
+            child: Container(color: _accent),
+          );
+        },
       ),
     );
   }
 }
 
-// ─── Internal animated helpers ────────────────────────────────────────────────
-
-/// Three animated dots for the generating indicator
 class _ThinkingDots extends StatefulWidget {
   @override
   State<_ThinkingDots> createState() => _ThinkingDotsState();
 }
-
 class _ThinkingDotsState extends State<_ThinkingDots> with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
-
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(duration: const Duration(milliseconds: 1200), vsync: this)..repeat();
+    _ctrl = AnimationController(duration: const Duration(milliseconds: 900), vsync: this)..repeat();
   }
-
   @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+  void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
@@ -438,85 +430,16 @@ class _ThinkingDotsState extends State<_ThinkingDots> with SingleTickerProviderS
         return AnimatedBuilder(
           animation: _ctrl,
           builder: (_, __) {
-            final phase = ((_ctrl.value * 3 - i).clamp(0.0, 1.0));
-            final scale = 0.6 + 0.4 * (1.0 - (phase - 0.5).abs() * 2).clamp(0.0, 1.0);
-            final opacity = 0.3 + 0.7 * (1.0 - (phase - 0.5).abs() * 2).clamp(0.0, 1.0);
+            final t = ((_ctrl.value * 3) - i).clamp(0.0, 1.0);
+            final lit = (1.0 - (t - 0.5).abs() * 2).clamp(0.0, 1.0) > 0.3;
             return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              child: Transform.scale(
-                scale: scale,
-                child: Opacity(
-                  opacity: opacity,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF7C3AED),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
+              width: 8, height: 8,
+              margin: const EdgeInsets.only(right: 4),
+              color: lit ? _cream : _cream.withAlpha(80),
             );
           },
         );
       }),
-    );
-  }
-}
-
-/// Animated logo for loading screen
-class _LoadingLogo extends StatefulWidget {
-  const _LoadingLogo();
-
-  @override
-  State<_LoadingLogo> createState() => _LoadingLogoState();
-}
-
-class _LoadingLogoState extends State<_LoadingLogo> with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _pulse;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(duration: const Duration(milliseconds: 1800), vsync: this)..repeat(reverse: true);
-    _pulse = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _pulse,
-      builder: (_, child) => Transform.scale(scale: _pulse.value, child: child),
-      child: Container(
-        width: 88,
-        height: 88,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: const LinearGradient(
-            colors: [Color(0xFF7C3AED), Color(0xFF06B6D4)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF7C3AED).withOpacity(0.5),
-              blurRadius: 40,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: const Icon(Icons.visibility_rounded, color: Colors.white, size: 40),
-      ),
     );
   }
 }

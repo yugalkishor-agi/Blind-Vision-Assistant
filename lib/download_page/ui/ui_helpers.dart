@@ -1,148 +1,133 @@
 // download_page/ui/ui_helpers.dart
+// ── BRUTALIST EDITORIAL DESIGN ──────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/logger.dart';
 
-// ─── Design tokens ────────────────────────────────────────────────────────────
-class _C {
-  static const bg        = Color(0xFF0A0A14);
-  static const surface   = Color(0xFF12121E);
-  static const surface2  = Color(0xFF1A1A2E);
-  static const border    = Color(0xFF2D2D3F);
-  static const violet    = Color(0xFF7C3AED);
-  static const cyan      = Color(0xFF06B6D4);
-  static const red       = Color(0xFFEF4444);
-  static const amber     = Color(0xFFF59E0B);
-  static const green     = Color(0xFF10B981);
-  static const textHi    = Color(0xFFF1F5F9);
-  static const textMid   = Color(0xFF94A3B8);
-  static const textLo    = Color(0xFF475569);
-}
-// ─────────────────────────────────────────────────────────────────────────────
+const _hCream   = Color(0xFFF5F0E8);
+const _hInk     = Color(0xFF1A1A1A);
+const _hInkSoft = Color(0xFF3A3530);
+const _hInkMute = Color(0xFF888070);
+const _hAccent  = Color(0xFFE8441A);
+const _hPaper   = Color(0xFFEDE8DF);
+const _hBorderW = 2.0;
 
 class UIHelpers {
-  /// Color-codes log levels for better visual distinction
+
   static Color getLogColor(String level) {
     switch (level) {
-      case 'ERROR':
-        return _C.red;
-      case 'WARN':
-        return _C.amber;
-      case 'INFO':
-        return _C.cyan;
-      case 'DEBUG':
-        return _C.textLo;
-      default:
-        return _C.textMid;
+      case 'ERROR': return _hAccent;
+      case 'WARN':  return const Color(0xFFD4A017);
+      case 'INFO':  return _hInk;
+      case 'DEBUG': return _hInkMute;
+      default:      return _hInkSoft;
     }
   }
 
-  /// Dark-themed debug dialog with copy/clear functionality
+  // ── Logs dialog ─────────────────────────────────────────────────────────────
   static void showLogsDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: _C.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: _C.border),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        backgroundColor: _hCream,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: _hCream,
+            border: Border.fromBorderSide(BorderSide(color: _hInk, width: _hBorderW)),
+            boxShadow: [BoxShadow(color: _hInk, offset: Offset(5, 5), blurRadius: 0)],
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Logs',
-                    style: TextStyle(
-                      color: _C.textHi,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+              // Header bar
+              Container(
+                width: double.infinity,
+                color: _hInk,
+                padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('DEBUG LOGS', style: TextStyle(
+                      fontSize: 11, fontWeight: FontWeight.w900,
+                      color: _hCream, letterSpacing: 1.5, fontFamily: 'monospace',
+                    )),
+                    Row(
+                      children: [
+                        _headerBtn(
+                          icon: Icons.copy_rounded,
+                          label: 'COPY',
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: Logger.getAllLogsAsString()));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Logs copied', style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w700)),
+                                backgroundColor: _hInk,
+                                behavior: SnackBarBehavior.floating,
+                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        _headerBtn(
+                          icon: Icons.delete_outline_rounded,
+                          label: 'CLEAR',
+                          isAccent: true,
+                          onTap: () {
+                            Logger.clear();
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
                     ),
-                  ),
-                  Row(
-                    children: [
-                      _iconBtn(
-                        Icons.copy_rounded,
-                        _C.textMid,
-                        () {
-                          Clipboard.setData(ClipboardData(text: Logger.getAllLogsAsString()));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('Logs copied'),
-                              backgroundColor: _C.surface2,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              behavior: SnackBarBehavior.floating,
+                  ],
+                ),
+              ),
+              // Log list
+              SizedBox(
+                width: double.maxFinite,
+                height: 320,
+                child: Logger.logs.isEmpty
+                    ? const Center(
+                        child: Text('No logs.', style: TextStyle(color: _hInkMute, fontFamily: 'monospace', fontSize: 12)),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(14),
+                        itemCount: Logger.logs.length,
+                        itemBuilder: (context, i) {
+                          final log = Logger.logs[i];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Text(
+                              log.toString(),
+                              style: TextStyle(
+                                fontFamily: 'monospace', fontSize: 11,
+                                color: getLogColor(log.level), height: 1.4,
+                              ),
                             ),
                           );
                         },
                       ),
-                      const SizedBox(width: 4),
-                      _iconBtn(
-                        Icons.delete_outline_rounded,
-                        _C.red.withOpacity(0.8),
-                        () {
-                          Logger.clear();
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
               ),
-              const SizedBox(height: 14),
-              Container(height: 1, color: _C.border),
-              const SizedBox(height: 8),
-              // Log list
-              SizedBox(
-                width: double.maxFinite,
-                height: 340,
-                child: ListView.builder(
-                  itemCount: Logger.logs.length,
-                  itemBuilder: (context, index) {
-                    final log = Logger.logs[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Text(
-                        log.toString(),
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 11,
-                          color: getLogColor(log.level),
-                          height: 1.4,
-                        ),
-                      ),
-                    );
-                  },
+              // Footer
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: _hInk, width: 1.5)),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Container(height: 1, color: _C.border),
-              const SizedBox(height: 12),
-              // Close button
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: _C.surface2,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _C.border),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Close',
-                      style: TextStyle(
-                        color: _C.textMid,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    color: _hPaper,
+                    child: const Center(
+                      child: Text('CLOSE', style: TextStyle(
+                        fontSize: 10, fontWeight: FontWeight.w900,
+                        color: _hInk, letterSpacing: 1.5, fontFamily: 'monospace',
+                      )),
                     ),
                   ),
                 ),
@@ -154,87 +139,77 @@ class UIHelpers {
     );
   }
 
-  /// Dark-themed error dialog with copy functionality
+  // ── Error dialog ─────────────────────────────────────────────────────────────
   static void showErrorDialog(BuildContext context, List<String> errorMessages) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: _C.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: _C.red.withOpacity(0.3)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        backgroundColor: _hCream,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: _hCream,
+            border: Border.fromBorderSide(BorderSide(color: _hAccent, width: _hBorderW)),
+            boxShadow: [BoxShadow(color: _hInk, offset: Offset(5, 5), blurRadius: 0)],
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: _C.red.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.error_outline_rounded, color: _C.red, size: 18),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Error Details',
-                        style: TextStyle(
-                          color: _C.textHi,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  _iconBtn(
-                    Icons.copy_rounded,
-                    _C.textMid,
-                    () {
-                      Clipboard.setData(ClipboardData(text: errorMessages.join('\n')));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('Errors copied'),
-                          backgroundColor: _C.surface2,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                  ),
-                ],
+              // Header bar
+              Container(
+                width: double.infinity,
+                color: _hAccent,
+                padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('ERROR DETAILS', style: TextStyle(
+                      fontSize: 11, fontWeight: FontWeight.w900,
+                      color: _hCream, letterSpacing: 1.5, fontFamily: 'monospace',
+                    )),
+                    _headerBtn(
+                      icon: Icons.copy_rounded,
+                      label: 'COPY',
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: errorMessages.join('\n')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Errors copied', style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w700)),
+                            backgroundColor: _hInk,
+                            behavior: SnackBarBehavior.floating,
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 14),
-              Container(height: 1, color: _C.border),
-              const SizedBox(height: 8),
               // Error list
               SizedBox(
                 width: double.maxFinite,
-                height: 260,
+                height: 240,
                 child: ListView.builder(
+                  padding: const EdgeInsets.all(14),
                   itemCount: errorMessages.length,
-                  itemBuilder: (context, index) {
+                  itemBuilder: (context, i) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.circle, size: 5, color: _C.red),
-                          const SizedBox(width: 8),
+                          Container(
+                            width: 6, height: 6,
+                            margin: const EdgeInsets.only(top: 5, right: 8),
+                            color: _hAccent,
+                          ),
                           Expanded(
                             child: Text(
-                              errorMessages[index],
+                              errorMessages[i],
                               style: const TextStyle(
-                                color: _C.red,
-                                fontSize: 12,
-                                height: 1.4,
+                                color: _hInkSoft, fontSize: 12,
+                                fontFamily: 'monospace', height: 1.5,
                               ),
                             ),
                           ),
@@ -244,23 +219,22 @@ class UIHelpers {
                   },
                 ),
               ),
-              const SizedBox(height: 12),
-              Container(height: 1, color: _C.border),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: _C.surface2,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _C.border),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Close',
-                      style: TextStyle(color: _C.textMid, fontWeight: FontWeight.w600, fontSize: 14),
+              // Footer
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: _hAccent, width: 1.5)),
+                ),
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    color: _hPaper,
+                    child: const Center(
+                      child: Text('CLOSE', style: TextStyle(
+                        fontSize: 10, fontWeight: FontWeight.w900,
+                        color: _hInk, letterSpacing: 1.5, fontFamily: 'monospace',
+                      )),
                     ),
                   ),
                 ),
@@ -272,16 +246,31 @@ class UIHelpers {
     );
   }
 
-  static Widget _iconBtn(IconData icon, Color color, VoidCallback onTap) {
+  static Widget _headerBtn({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isAccent = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(7),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
+          color: isAccent ? _hAccent : _hCream.withAlpha(30),
+          border: Border.all(color: _hCream.withAlpha(100), width: 1),
         ),
-        child: Icon(icon, color: color, size: 16),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: _hCream, size: 12),
+            const SizedBox(width: 4),
+            Text(label, style: const TextStyle(
+              fontSize: 9, fontWeight: FontWeight.w900,
+              color: _hCream, letterSpacing: 1.2, fontFamily: 'monospace',
+            )),
+          ],
+        ),
       ),
     );
   }

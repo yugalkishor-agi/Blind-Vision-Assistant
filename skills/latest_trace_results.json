@@ -1,0 +1,52 @@
+[
+  {
+    "name": "startup-and-bootstrap-lifecycle",
+    "trace_id": "7c110f289b32b76e7eb840f78ff4a73e",
+    "spans": 5
+  },
+  {
+    "name": "on-device-gemma-3n-inference-engine",
+    "trace_id": "2b48fe9e6665c87bcc2f32b5317c3398",
+    "spans": 5
+  },
+  {
+    "name": "multimodal-camera-and-image-pipeline",
+    "trace_id": "9335cf9c539745beb765d324c84bdbc1",
+    "spans": 4
+  },
+  {
+    "name": "ocr-text-recognition-and-instant-reader",
+    "trace_id": "c1d6227e4bdcfb0615bc91d58496911d",
+    "spans": 4
+  },
+  {
+    "name": "voice-dictation-and-speech-service-engine",
+    "trace_id": "6ac71c98c3a8ad0ecb3c3ab95689f05a",
+    "spans": 5
+  },
+  {
+    "name": "streaming-tts-synthesis-and-chunker",
+    "trace_id": "ac87d44606211a2c1f51f58a9551f665",
+    "spans": 4
+  },
+  {
+    "name": "accessible-ui-and-tactile-hardware-shortcuts",
+    "trace_id": "818b0c3c69715589f00c2f2eb8e8fee8",
+    "spans": 5
+  },
+  {
+    "name": "background-model-downloader-and-storage-architecture",
+    "trace_id": "8d8d2e3c81e31378f04722be841158d5",
+    "spans": 5
+  },
+  {
+    "name": "error-recovery-and-self-healing-subsystem",
+    "trace_id": "6898bdf21ce2ae9580f19f92866075ae",
+    "spans": 4
+  },
+  {
+    "name": "build-compilation-and-polishing-pipeline",
+    "trace_id": "c25af1dead8c56903047b38b9fa9dbf9",
+    "spans": 5
+  }
+]

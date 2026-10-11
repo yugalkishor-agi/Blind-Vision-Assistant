@@ -58,70 +58,71 @@ class MyApp extends StatelessWidget {
       title: 'Blind Vision Assistant',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.dark(
-          primary: const Color(0xFF7C3AED),       // electric violet
-          secondary: const Color(0xFF06B6D4),     // cyan neon
-          tertiary: const Color(0xFFEC4899),      // hot pink
-          surface: const Color(0xFF0F0F1A),       // deep void
-          surfaceContainerHighest: const Color(0xFF1A1A2E),
-          onPrimary: Colors.white,
-          onSurface: const Color(0xFFE2E8F0),
-          outline: const Color(0xFF2D2D3F),
-        ),
-        scaffoldBackgroundColor: const Color(0xFF0A0A14),
-        fontFamily: 'SF Pro Display',
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(color: Color(0xFFF1F5F9), fontWeight: FontWeight.w700),
-          displayMedium: TextStyle(color: Color(0xFFF1F5F9), fontWeight: FontWeight.w700),
-          headlineLarge: TextStyle(color: Color(0xFFF1F5F9), fontWeight: FontWeight.w700),
-          headlineMedium: TextStyle(color: Color(0xFFE2E8F0), fontWeight: FontWeight.w600),
-          headlineSmall: TextStyle(color: Color(0xFFE2E8F0), fontWeight: FontWeight.w600),
-          titleLarge: TextStyle(color: Color(0xFFCBD5E1), fontWeight: FontWeight.w600),
-          bodyLarge: TextStyle(color: Color(0xFFCBD5E1)),
-          bodyMedium: TextStyle(color: Color(0xFF94A3B8)),
-          bodySmall: TextStyle(color: Color(0xFF64748B)),
+        useMaterial3: false,
+        brightness: Brightness.light,
+        // ── Brutalist editorial palette ───────────────────────────────────
+        scaffoldBackgroundColor: const Color(0xFFF5F0E8), // warm cream
+        colorScheme: const ColorScheme.light(
+          primary:   Color(0xFF1A1A1A), // near-black
+          secondary: Color(0xFFE8441A), // orange-red accent
+          tertiary:  Color(0xFFE8441A),
+          surface:   Color(0xFFF5F0E8),
+          onPrimary: Color(0xFFF5F0E8),
+          onSecondary: Color(0xFFF5F0E8),
+          onSurface: Color(0xFF1A1A1A),
+          outline:   Color(0xFF1A1A1A),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF0A0A14),
+          backgroundColor: Color(0xFFF5F0E8),
           elevation: 0,
+          scrolledUnderElevation: 0,
           titleTextStyle: TextStyle(
-            color: Color(0xFFF1F5F9),
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
+            color: Color(0xFF1A1A1A),
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
           ),
-          iconTheme: IconThemeData(color: Color(0xFF94A3B8)),
+          iconTheme: IconThemeData(color: Color(0xFF1A1A1A)),
         ),
         cardTheme: CardThemeData(
-          color: const Color(0xFF12121E),
+          color: const Color(0xFFF5F0E8),
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: Color(0xFF1E1E30), width: 1),
+            borderRadius: BorderRadius.zero,
+            side: BorderSide(color: Color(0xFF1A1A1A), width: 2),
           ),
         ),
-        inputDecorationTheme: InputDecorationTheme(
+        inputDecorationTheme: const InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF12121E),
+          fillColor: Color(0xFFEDE8DF),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF2D2D3F)),
+            borderRadius: BorderRadius.zero,
+            borderSide: BorderSide(color: Color(0xFF1A1A1A), width: 2),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF2D2D3F)),
+            borderRadius: BorderRadius.zero,
+            borderSide: BorderSide(color: Color(0xFF1A1A1A), width: 2),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF7C3AED), width: 1.5),
+            borderRadius: BorderRadius.zero,
+            borderSide: BorderSide(color: Color(0xFFE8441A), width: 2.5),
           ),
-          hintStyle: const TextStyle(color: Color(0xFF475569)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          hintStyle: TextStyle(color: Color(0xFF888070), fontFamily: 'monospace'),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        dividerColor: const Color(0xFF1A1A1A),
+        textTheme: const TextTheme(
+          displayLarge:  TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w900),
+          displayMedium: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w900),
+          headlineLarge: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w900),
+          headlineMedium:TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w800),
+          headlineSmall: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w800),
+          titleLarge:    TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w700),
+          bodyLarge:     TextStyle(color: Color(0xFF1A1A1A)),
+          bodyMedium:    TextStyle(color: Color(0xFF3A3530)),
+          bodySmall:     TextStyle(color: Color(0xFF666050), fontFamily: 'monospace'),
         ),
       ),
-      // Set the initial page to the model download screen
-      // Users must download the ML model before they can use the chat feature
       home: const ModelDownloadPage(),
     );
   }

@@ -13,8 +13,6 @@ import 'ui/modern_ui_widgets.dart';
 import 'ui/ui_helpers.dart';
 
 /// Main page widget that handles the model download UI and state management.
-/// This is a StatefulWidget that manages the download process for ML models,
-/// including authentication, progress tracking, error handling, and user interactions.
 class ModelDownloadPage extends StatefulWidget {
   const ModelDownloadPage({Key? key}) : super(key: key);
 
@@ -23,28 +21,16 @@ class ModelDownloadPage extends StatefulWidget {
 }
 
 class _ModelDownloadPageState extends State<ModelDownloadPage> {
-  // Current status of the download process (notStarted, downloading, completed, etc.)
   DownloadStatus _downloadStatus = DownloadStatus.notStarted;
-
-  // Progress information including bytes downloaded, speed, and estimated time
   DownloadProgress? _progress;
-
-  // List of error messages to display to the user when downloads fail
   List<String> _errorMessages = [];
-
-  // Controls visibility of the license agreement bottom sheet
   bool _showAgreementSheet = false;
-
-  // Subscription to listen for log updates and refresh UI accordingly
   late StreamSubscription _logSubscription;
-
-  // Business logic handler that manages all download operations
   late DownloadPageLogic _logic;
 
   @override
   void initState() {
     super.initState();
-    // Initialize all components in the correct order
     _initializeLogic();
     _initializeDownloader();
     _checkDownloadState();
@@ -53,45 +39,31 @@ class _ModelDownloadPageState extends State<ModelDownloadPage> {
 
   @override
   void dispose() {
-    // Clean up resources to prevent memory leaks
     _logSubscription.cancel();
-    _logic.dispose(); // Dispose the logic to clean up timers
+    _logic.dispose();
     super.dispose();
   }
 
-  /// Initializes the download logic with callback functions that update the UI state.
-  /// This separates business logic from UI concerns by passing state setters as callbacks.
   void _initializeLogic() {
     _logic = DownloadPageLogic(
-      // Callback to update download status (triggers UI rebuilds)
       setDownloadStatus: (status) => setState(() => _downloadStatus = status),
-      // Callback to update progress information (updates progress bars/text)
       setProgress: (progress) => setState(() => _progress = progress),
-      // Callback to update error messages (shows error dialogs/messages)
       setErrorMessages: (messages) => setState(() => _errorMessages = messages),
-      // Callback to show/hide license agreement sheet
-      setShowAgreementSheet: (show) =>
-          setState(() => _showAgreementSheet = show),
+      setShowAgreementSheet: (show) => setState(() => _showAgreementSheet = show),
     );
   }
 
-  /// Sets up a listener for log entries to refresh the UI when new logs are added.
-  /// This ensures the logs dialog shows real-time updates without manual refresh.
   void _setupLogListener() {
     _logSubscription = Logger.logStream.listen((logEntry) {
-      setState(() {}); // Trigger rebuild to update logs display
+      setState(() {});
     });
   }
 
-  /// Initializes the download manager system.
-  /// This prepares the underlying download infrastructure for use.
   Future<void> _initializeDownloader() async {
     await DownloadManager.initialize();
     Logger.info('Download manager initialized');
   }
 
-  /// Checks if there are any ongoing downloads from previous app sessions.
-  /// This handles app restarts gracefully by resuming interrupted downloads.
   Future<void> _checkDownloadState() async {
     await _logic.checkForOngoingDownloads(context);
   }
@@ -99,123 +71,108 @@ class _ModelDownloadPageState extends State<ModelDownloadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A14),
-      body: Stack(
-        children: [
-          // ── Ambient background radial glows ──────────────────────────────
-          Positioned(
-            top: -120,
-            left: -80,
-            child: _ambientBlob(const Color(0xFF7C3AED), 340),
-          ),
-          Positioned(
-            bottom: -80,
-            right: -60,
-            child: _ambientBlob(const Color(0xFF06B6D4), 260),
-          ),
-
-          // ── Main content ─────────────────────────────────────────────────
-          SafeArea(
-            child: Column(
-              children: [
-                // ── Top bar with logs button ──────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 12, 16, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: const Color(0xFFF5F0E8),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ── Brutalist top bar ─────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.fromLTRB(24, 16, 16, 16),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5F0E8),
+                border: Border(bottom: BorderSide(color: Color(0xFF1A1A1A), width: 2)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // App badge
-                      Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF7C3AED), Color(0xFF06B6D4)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(Icons.visibility_rounded, color: Colors.white, size: 18),
-                          ),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Vision AI',
-                            style: TextStyle(
-                              color: Color(0xFFF1F5F9),
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'BLIND VISION',
+                        style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w900,
+                          color: Color(0xFF1A1A1A), letterSpacing: 2.0,
+                        ),
                       ),
-                      // Logs button
-                      ModernUIWidgets.buildLogsButton(
-                        context,
-                        () => UIHelpers.showLogsDialog(context),
+                      Text(
+                        'ASSISTANT',
+                        style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w900,
+                          color: Color(0xFFE8441A), letterSpacing: 2.0,
+                        ),
                       ),
                     ],
                   ),
-                ),
-
-                // ── Scrollable body ───────────────────────────────────────
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Animated icon
-                        ModernUIWidgets.buildDownloadIcon(_downloadStatus, _progress),
-
-                        const SizedBox(height: 36),
-
-                        // Status headline + subtitle
-                        ModernUIWidgets.buildStatusMessage(
-                          _downloadStatus,
-                          _progress,
-                          _errorMessages,
-                        ),
-
-                        const SizedBox(height: 28),
-
-                        // Progress bar
-                        ModernUIWidgets.buildProgressBar(_progress, _downloadStatus),
-
-                        const SizedBox(height: 44),
-
-                        // Action buttons
-                        ModernUIWidgets.buildActionButtons(
-                          _downloadStatus,
-                          () => _logic.startDownload(),
-                          () => _logic.pauseDownload(),
-                          () => _logic.resumeDownload(),
-                          () => _logic.showCancelConfirmation(context),
-                          () => Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => ChatPage()),
-                          ),
-                        ),
-
-                        // Error details button
-                        if (_errorMessages.isNotEmpty &&
-                            _downloadStatus == DownloadStatus.failed) ...[
-                          const SizedBox(height: 20),
-                          _buildErrorBanner(),
-                        ],
-                      ],
-                    ),
+                  ModernUIWidgets.buildLogsButton(
+                    context,
+                    () => UIHelpers.showLogsDialog(context),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+
+            // ── Scrollable body ───────────────────────────────────────────
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+
+                    // Animated status icon
+                    ModernUIWidgets.buildDownloadIcon(_downloadStatus, _progress),
+
+                    const SizedBox(height: 32),
+
+                    // Editorial headline + body
+                    ModernUIWidgets.buildStatusMessage(
+                      _downloadStatus, _progress, _errorMessages,
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // Thick bordered progress bar
+                    ModernUIWidgets.buildProgressBar(_progress, _downloadStatus),
+
+                    if (_progress != null &&
+                        (_downloadStatus == DownloadStatus.downloading ||
+                         _downloadStatus == DownloadStatus.paused))
+                      const SizedBox(height: 28)
+                    else
+                      const SizedBox(height: 20),
+
+                    // Action buttons
+                    ModernUIWidgets.buildActionButtons(
+                      _downloadStatus,
+                      () => _logic.startDownload(),
+                      () => _logic.pauseDownload(),
+                      () => _logic.resumeDownload(),
+                      () => _logic.showCancelConfirmation(context),
+                      () => Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => ChatPage()),
+                      ),
+                    ),
+
+                    // Error banner
+                    if (_errorMessages.isNotEmpty &&
+                        _downloadStatus == DownloadStatus.failed) ...[
+                      const SizedBox(height: 16),
+                      _buildErrorBanner(),
+                    ],
+
+                    const SizedBox(height: 32),
+                    _buildFooterNote(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      // License agreement bottom sheet - shown when model requires acceptance
       bottomSheet: _showAgreementSheet
           ? ModernUIWidgets.buildLicenseBottomSheet(
               context,
@@ -226,56 +183,63 @@ class _ModelDownloadPageState extends State<ModelDownloadPage> {
     );
   }
 
-  /// Soft ambient radial glow blob for background depth
-  Widget _ambientBlob(Color color, double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [color.withOpacity(0.18), Colors.transparent],
-        ),
-      ),
-    );
-  }
-
-  /// Glassmorphic error banner
   Widget _buildErrorBanner() {
     return GestureDetector(
       onTap: () => UIHelpers.showErrorDialog(context, _errorMessages),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        decoration: BoxDecoration(
-          color: const Color(0xFFEF4444).withOpacity(0.12),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.35)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFF0EC),
+          border: Border.fromBorderSide(
+            BorderSide(color: Color(0xFFE8441A), width: 2),
+          ),
+          boxShadow: [
+            BoxShadow(color: Color(0xFFE8441A), offset: Offset(3, 3), blurRadius: 0),
+          ],
         ),
-        child: Row(
+        child: const Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.error_outline_rounded, color: Color(0xFFEF4444), size: 18),
-            ),
-            const SizedBox(width: 12),
+            Icon(Icons.error_outline_rounded, color: Color(0xFFE8441A), size: 18),
+            SizedBox(width: 10),
             Expanded(
               child: Text(
-                'View Error Details',
+                'Error occurred — tap to view details',
                 style: TextStyle(
-                  color: const Color(0xFFEF4444).withOpacity(0.9),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  color: Color(0xFFE8441A), fontWeight: FontWeight.w700,
+                  fontSize: 13, fontFamily: 'monospace',
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: const Color(0xFFEF4444).withOpacity(0.6), size: 18),
+            Icon(Icons.chevron_right_rounded, color: Color(0xFFE8441A), size: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFooterNote() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDE8DF),
+        border: Border.all(color: const Color(0xFF1A1A1A), width: 1.5),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.lock_outline_rounded, size: 13, color: Color(0xFF888070)),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Runs fully offline. No data sent anywhere after setup.',
+              style: TextStyle(
+                fontSize: 11, fontFamily: 'monospace',
+                color: Color(0xFF888070), height: 1.5,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

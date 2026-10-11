@@ -238,7 +238,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           autofocus: true,
           onKeyEvent: _speechService!.handleFocusKey, // Speech integration
           child: Scaffold(
-            backgroundColor: const Color(0xFFF8F9FA),
+            backgroundColor: const Color(0xFFF5F0E8),
             appBar: ChatUIBuilder.buildCleanAppBar(
               onNewChat: _newChat,
               onToggleSettings: _navigateToSettings,
