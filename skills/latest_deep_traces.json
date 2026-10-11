@@ -1,0 +1,27 @@
+[
+  {
+    "name": "multimodal-vision-assistant-end-to-end-workflow",
+    "trace_id": "6cd1b6dba226a19126bdc2350216dc06",
+    "spans": 11
+  },
+  {
+    "name": "voice-dictation-and-intent-router-pipeline",
+    "trace_id": "57dac27c617c2aa80a16bed9f8ed6d70",
+    "spans": 5
+  },
+  {
+    "name": "background-model-downloader-and-scoped-storage",
+    "trace_id": "a91cd2ebf9834c0a05de37210e442bf6",
+    "spans": 6
+  },
+  {
+    "name": "error-recovery-and-accessibility-self-healing",
+    "trace_id": "7f74c735b7227b4c3f9eb092ad25845a",
+    "spans": 5
+  },
+  {
+    "name": "repository-architecture-refactor-and-polishing",
+    "trace_id": "869614e3535d93f661b512558bff0770",
+    "spans": 6
+  }
+]

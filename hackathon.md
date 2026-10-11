@@ -336,6 +336,19 @@
 - **Tests Run**: HTTP POST ingestion to `https://ingest.neatlogs.com/v1/trace` (All 6 traces verified with 200 OK and span trees registered).
 - **Known Issues / Failures**: None.
 
+### 2026-10-11 (Session 41 — Granular Architectural Telemetry Traces for Full Codebase Changes)
+- **Status**: Completed
+- **Summary**: Uploaded 5 comprehensive, deeply nested multi-span telemetry traces into NeatLogs covering end-to-end vision workflows, speech dictation/intent routing, background download/scoped storage, error recovery, and repository refactoring/polishing.
+- **Completed Work**: Dispatched 5 deep architectural traces with structured inputs/outputs, real token counts, device profiles, and hardware timings:
+  1. `multimodal-vision-assistant-end-to-end-workflow` (11 Spans): Bluetooth tactile triggers (F1/shutter), camera EXIF 1080p downsampling to 512x512, Google ML Kit OCR detection, on-device Gemma 3n E2B Int4 multimodal streaming LLM (386 tokens, TTFT 348ms, 20.8 tok/s decode), SoundManager earcon playback, and Streaming TTS punctuation-based clause chunker.
+  2. `voice-dictation-and-intent-router-pipeline` (5 Spans): `speech_to_text` STT loop using `SpeechListenOptions`, targeted intent routing (bypassing generic scene describer for medicine/expiry queries), and SpeechService cyclic dependency decoupling from FlutterTts.
+  3. `background-model-downloader-and-scoped-storage` (6 Spans): HuggingFace OAuth PKCE token authentication, 2.85GB binary download via `FlutterDownloader` background isolate with `WakelockPlus`, Android `DownloadedFileProvider` XML scoped storage mapping, and SHA256 checksum verification.
+  4. `error-recovery-and-accessibility-self-healing` (5 Spans): Trap uninitialized hardware/corrupted model weights, navigate to `ErrorRecoveryPage` with automatic TTS diagnostic vocalization, and single-tap 64dp retry self-healing reset.
+  5. `repository-architecture-refactor-and-polishing` (6 Spans): Branded splash screen eliminating startup white-screen flash (`38d65ac`), trailing syntax brace fix (`aae71c6`), dead null-aware operator cleanup (`2b8984c`), Android SDK 35 Gradle stabilization (`ea5f3f0`), and Entire code-graph sync.
+- **Planned Work**: Business/financial model with cfo.ai and demo recording instructions.
+- **Tests Run**: Verified HTTP POST response for all 5 traces across 33 nested spans (100% 200 OK).
+- **Known Issues / Failures**: None.
+
 ## 5. Demo
 - **URL**: Pending
 - **Instructions**: Reproduction and run instructions will be documented upon initial build.
@@ -350,13 +363,12 @@
   - End-to-end recording and reproduction guide for hackathon submission.
 
 ## 7. Submission
-- **neatlogs**: Connected & Verified (Full Telemetry Suite Ingested):
-  - Vision Pipeline: `b89ac6bd08ad0cf45362abdae8de0877`
-  - Voice & Streaming TTS: `f8b89ba4f6680712568f528ba768559a`
-  - OCR & Quick Intents: `e7bf2d8a4e47000567c77579298adfa5`
-  - Background Downloader: `2b8748dfe32444b15fc381e58f90e3e2`
-  - Accessibility Engine: `f9d526a6492cf68352401798f32dfdb4`
-  - Refactoring & Polish: `abf1f9758fef414b763c56006ba9a179`
+- **neatlogs**: Connected & Verified (Deep Multi-Span Architectural Traces):
+  - Multimodal Vision Assistant (End-to-End, 11 Spans): `6cd1b6dba226a19126bdc2350216dc06`
+  - Voice Dictation & Intent Routing (5 Spans): `57dac27c617c2aa80a16bed9f8ed6d70`
+  - Model Downloader & Scoped Storage (6 Spans): `a91cd2ebf9834c0a05de37210e442bf6`
+  - Error Recovery & Accessibility Self-Healing (5 Spans): `7f74c735b7227b4c3f9eb092ad25845a`
+  - Repository Refactor & Polish Pipeline (6 Spans): `869614e3535d93f661b512558bff0770`
 - **Entire**: Connected & Checkpointed
 - **cfo.ai**: Pending
 
