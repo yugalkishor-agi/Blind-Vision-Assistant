@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:gemma_chat/chat_page/gemma_vision_chat.dart';
+import 'package:blind_vision_assistant/chat_page/gemma_vision_chat.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 

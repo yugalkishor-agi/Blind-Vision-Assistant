@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:gemma_chat/download_page/model_download_page.dart';
+import 'package:blind_vision_assistant/download_page/model_download_page.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 /// Top-level callback function for handling download progress updates.

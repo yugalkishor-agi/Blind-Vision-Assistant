@@ -1,8 +1,8 @@
 // lib/chat_page/error_recovery_page.dart
 import 'package:flutter/material.dart';
-import 'package:gemma_chat/download_page/services/download_manager.dart';
-import 'package:gemma_chat/download_page/services/download_state_manager.dart';
-import 'package:gemma_chat/download_page/model_download_page.dart';
+import 'package:blind_vision_assistant/download_page/services/download_manager.dart';
+import 'package:blind_vision_assistant/download_page/services/download_state_manager.dart';
+import 'package:blind_vision_assistant/download_page/model_download_page.dart';
 
 class ErrorRecoveryPage extends StatefulWidget {
   const ErrorRecoveryPage({super.key});

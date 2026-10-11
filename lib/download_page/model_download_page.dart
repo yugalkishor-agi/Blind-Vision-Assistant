@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:gemma_chat/chat_page/gemma_vision_chat.dart';
+import 'package:blind_vision_assistant/chat_page/gemma_vision_chat.dart';
 
 import 'models/enums.dart';
 import 'models/models.dart';

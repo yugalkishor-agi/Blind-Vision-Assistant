@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.hackathon.blind_vision_assistant"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
