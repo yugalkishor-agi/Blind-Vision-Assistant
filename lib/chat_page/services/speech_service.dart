@@ -86,7 +86,7 @@ class SpeechService {
     if (message.isEmpty) return;
   _tts.speak(message);
 }
-  }
+  
 
   /* Voice dictation functionality */
 
