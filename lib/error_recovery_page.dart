@@ -1,8 +1,24 @@
-// lib/chat_page/error_recovery_page.dart
+// lib/error_recovery_page.dart
 import 'package:flutter/material.dart';
 import 'package:blind_vision_assistant/download_page/services/download_manager.dart';
 import 'package:blind_vision_assistant/download_page/services/download_state_manager.dart';
 import 'package:blind_vision_assistant/download_page/model_download_page.dart';
+
+// ─── Design tokens ────────────────────────────────────────────────────────────
+class _C {
+  static const bg        = Color(0xFF0A0A14);
+  static const surface   = Color(0xFF12121E);
+  static const surface2  = Color(0xFF1A1A2E);
+  static const border    = Color(0xFF2D2D3F);
+  static const violet    = Color(0xFF7C3AED);
+  static const cyan      = Color(0xFF06B6D4);
+  static const red       = Color(0xFFEF4444);
+  static const amber     = Color(0xFFF59E0B);
+  static const textHi    = Color(0xFFF1F5F9);
+  static const textMid   = Color(0xFF94A3B8);
+  static const textLo    = Color(0xFF475569);
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 class ErrorRecoveryPage extends StatefulWidget {
   const ErrorRecoveryPage({super.key});
@@ -11,213 +27,299 @@ class ErrorRecoveryPage extends StatefulWidget {
   State<ErrorRecoveryPage> createState() => _ErrorRecoveryPageState();
 }
 
-class _ErrorRecoveryPageState extends State<ErrorRecoveryPage> {
+class _ErrorRecoveryPageState extends State<ErrorRecoveryPage>
+    with SingleTickerProviderStateMixin {
   bool _isCleaningUp = false;
+  late AnimationController _pulseCtrl;
+  late Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..repeat(reverse: true);
+    _pulseAnim = Tween<double>(begin: 0.7, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Error icon with gradient background
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [Colors.red[400]!, Colors.red[600]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.red[400]!.withOpacity(0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.error_outline_rounded,
-                  size: 48,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 32),
+      backgroundColor: _C.bg,
+      body: Stack(
+        children: [
+          // ── Red ambient glow (error atmosphere) ───────────────────────────
+          Positioned(
+            top: -80,
+            left: -60,
+            child: _ambientBlob(_C.red, 300),
+          ),
+          Positioned(
+            bottom: -60,
+            right: -40,
+            child: _ambientBlob(_C.violet, 200),
+          ),
 
-              // Title
-              Text(
-                'Model Failed to Load',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
+          // ── Content ───────────────────────────────────────────────────────
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(flex: 2),
 
-              // Explanation card
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.orange[200]!, width: 1.5),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline_rounded,
-                          size: 24,
-                          color: Colors.orange[700],
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'What happened?',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                      ],
+                  // ── Error icon ─────────────────────────────────────────────
+                  AnimatedBuilder(
+                    animation: _pulseAnim,
+                    builder: (_, child) => Transform.scale(
+                      scale: _isCleaningUp ? 1.0 : _pulseAnim.value,
+                      child: child,
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'The AI model file appears to be corrupted or incomplete. This usually happens when the download was interrupted or the file became damaged.',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[700],
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-
-              // Action buttons
-              if (_isCleaningUp) ...[
-                // Loading state
-                Container(
-                  padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.grey[200]!),
-                  ),
-                  child: Column(
-                    children: [
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Cleaning up corrupted files...',
-                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                      ),
-                    ],
-                  ),
-                ),
-              ] else ...[
-                // Primary action button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue[500]!, Colors.blue[700]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue[400]!.withOpacity(0.4),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
+                    child: Container(
+                      width: 110,
+                      height: 110,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          colors: [_C.red, Color(0xFFDC2626)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: TextButton.icon(
-                      onPressed: _handleDeleteAndRetry,
-                      icon: const Icon(
-                        Icons.refresh_rounded,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      label: const Text(
-                        'Delete & Download Fresh Copy',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Help section
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey[200]!),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.help_outline_rounded,
-                            size: 20,
-                            color: Colors.grey[600],
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Still having issues?',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
-                            ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _C.red.withOpacity(0.4),
+                            blurRadius: 40,
+                            offset: const Offset(0, 16),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'You can force quit this app and try again. If problems persist, delete the app completely and reinstall to start fresh.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                          height: 1.4,
-                        ),
-                        textAlign: TextAlign.center,
+                      child: const Icon(
+                        Icons.error_outline_rounded,
+                        size: 52,
+                        color: Colors.white,
                       ),
-                    ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 36),
+
+                  // ── Title ──────────────────────────────────────────────────
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [_C.red, _C.amber],
+                    ).createShader(bounds),
+                    child: const Text(
+                      'Model Failed to Load',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // ── What happened card ─────────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: _C.amber.withOpacity(0.07),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: _C.amber.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(7),
+                              decoration: BoxDecoration(
+                                color: _C.amber.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.info_outline_rounded, size: 18, color: _C.amber),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'What happened?',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: _C.textHi,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'The AI model file appears to be corrupted or incomplete. This usually happens when the download was interrupted or the file became damaged.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: _C.textMid,
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Spacer(flex: 2),
+
+                  // ── Action section ─────────────────────────────────────────
+                  if (_isCleaningUp)
+                    _buildCleanupState()
+                  else
+                    _buildActionState(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _ambientBlob(Color color, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color.withOpacity(0.16), Colors.transparent],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCleanupState() {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: _C.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _C.border),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 48,
+            height: 48,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(_C.violet),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Cleaning up…',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: _C.textHi,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Removing corrupted files and preparing for a fresh download.',
+            style: TextStyle(fontSize: 13, color: _C.textMid, height: 1.5),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionState() {
+    return Column(
+      children: [
+        // Primary CTA
+        GestureDetector(
+          onTap: _handleDeleteAndRetry,
+          child: Container(
+            width: double.infinity,
+            height: 58,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [_C.violet, _C.cyan],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: _C.violet.withOpacity(0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.refresh_rounded, color: Colors.white, size: 22),
+                SizedBox(width: 10),
+                Text(
+                  'Delete & Download Fresh Copy',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.1,
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Help section
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: _C.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _C.border),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.help_outline_rounded, size: 16, color: _C.textLo),
+                  SizedBox(width: 7),
+                  Text(
+                    'Still having issues?',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _C.textMid),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Force quit the app and try again. If problems persist, delete and reinstall the app for a clean start.',
+                style: TextStyle(fontSize: 13, color: _C.textLo, height: 1.5),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 

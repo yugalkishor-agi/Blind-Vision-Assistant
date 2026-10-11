@@ -56,8 +56,70 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Blind Vision Assistant',
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
-
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.dark(
+          primary: const Color(0xFF7C3AED),       // electric violet
+          secondary: const Color(0xFF06B6D4),     // cyan neon
+          tertiary: const Color(0xFFEC4899),      // hot pink
+          surface: const Color(0xFF0F0F1A),       // deep void
+          surfaceContainerHighest: const Color(0xFF1A1A2E),
+          onPrimary: Colors.white,
+          onSurface: const Color(0xFFE2E8F0),
+          outline: const Color(0xFF2D2D3F),
+        ),
+        scaffoldBackgroundColor: const Color(0xFF0A0A14),
+        fontFamily: 'SF Pro Display',
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(color: Color(0xFFF1F5F9), fontWeight: FontWeight.w700),
+          displayMedium: TextStyle(color: Color(0xFFF1F5F9), fontWeight: FontWeight.w700),
+          headlineLarge: TextStyle(color: Color(0xFFF1F5F9), fontWeight: FontWeight.w700),
+          headlineMedium: TextStyle(color: Color(0xFFE2E8F0), fontWeight: FontWeight.w600),
+          headlineSmall: TextStyle(color: Color(0xFFE2E8F0), fontWeight: FontWeight.w600),
+          titleLarge: TextStyle(color: Color(0xFFCBD5E1), fontWeight: FontWeight.w600),
+          bodyLarge: TextStyle(color: Color(0xFFCBD5E1)),
+          bodyMedium: TextStyle(color: Color(0xFF94A3B8)),
+          bodySmall: TextStyle(color: Color(0xFF64748B)),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF0A0A14),
+          elevation: 0,
+          titleTextStyle: TextStyle(
+            color: Color(0xFFF1F5F9),
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+          iconTheme: IconThemeData(color: Color(0xFF94A3B8)),
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF12121E),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: Color(0xFF1E1E30), width: 1),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF12121E),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF2D2D3F)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF2D2D3F)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF7C3AED), width: 1.5),
+          ),
+          hintStyle: const TextStyle(color: Color(0xFF475569)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+      ),
       // Set the initial page to the model download screen
       // Users must download the ML model before they can use the chat feature
       home: const ModelDownloadPage(),

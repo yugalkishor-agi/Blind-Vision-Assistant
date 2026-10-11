@@ -4,8 +4,27 @@ import 'package:flutter/material.dart';
 import '../models/enums.dart';
 import '../models/models.dart';
 
+// ─── Design tokens ────────────────────────────────────────────────────────────
+class _C {
+  static const bg        = Color(0xFF0A0A14);
+  static const surface   = Color(0xFF12121E);
+  static const surface2  = Color(0xFF1A1A2E);
+  static const border    = Color(0xFF2D2D3F);
+  static const violet    = Color(0xFF7C3AED);
+  static const cyan      = Color(0xFF06B6D4);
+  static const pink      = Color(0xFFEC4899);
+  static const green     = Color(0xFF10B981);
+  static const amber     = Color(0xFFF59E0B);
+  static const red       = Color(0xFFEF4444);
+  static const textHi    = Color(0xFFF1F5F9);
+  static const textMid   = Color(0xFF94A3B8);
+  static const textLo    = Color(0xFF475569);
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 class ModernUIWidgets {
-  /// Creates a reusable gradient button with consistent styling and disabled states
+
+  // ── Internal gradient button ───────────────────────────────────────────────
   static Widget _buildGradientButton({
     required VoidCallback? onPressed,
     required String text,
@@ -14,55 +33,58 @@ class ModernUIWidgets {
     bool isSecondary = false,
     double? width,
   }) {
-    // Default gradient colors based on button type
-    final colors =
-        gradientColors ??
+    final enabled = onPressed != null;
+    final colors = gradientColors ??
         (isSecondary
-            ? [Colors.grey[400]!, Colors.grey[500]!]
-            : [const Color(0xFF2196F3), const Color(0xFF1976D2)]);
+            ? [const Color(0xFF374151), const Color(0xFF4B5563)]
+            : [_C.violet, const Color(0xFF5B21B6)]);
 
-    return Container(
-      width: width,
-      height: 56,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          // Disable gradient when button is disabled
-          colors: onPressed != null
-              ? colors
-              : [Colors.grey[300]!, Colors.grey[400]!],
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: enabled ? 1.0 : 0.45,
+      child: Container(
+        width: width,
+        height: 58,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: enabled ? colors : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: enabled ? colors.first.withOpacity(0.4) : _C.border,
+            width: 1,
+          ),
+          boxShadow: enabled
+              ? [
+                  BoxShadow(
+                    color: colors.first.withOpacity(0.35),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : null,
         ),
-        borderRadius: BorderRadius.circular(12),
-        // Add shadow only when button is enabled
-        boxShadow: onPressed != null
-            ? [
-                BoxShadow(
-                  color: colors[0].withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(16),
+            splashColor: Colors.white10,
+            highlightColor: Colors.white.withAlpha(13),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Text(
                   text,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ],
@@ -73,81 +95,69 @@ class ModernUIWidgets {
     );
   }
 
-  /// Dynamic icon that changes based on download status with smooth animations
-  static Widget buildDownloadIcon(
-    DownloadStatus status,
-    DownloadProgress? progress,
-  ) {
+  // ── Download icon ──────────────────────────────────────────────────────────
+  static Widget buildDownloadIcon(DownloadStatus status, DownloadProgress? progress) {
     Widget iconWidget;
-    Color iconColor = const Color(0xFF2196F3);
 
     switch (status) {
       case DownloadStatus.notStarted:
       case DownloadStatus.cancelled:
       case DownloadStatus.failed:
-        iconWidget = Icon(Icons.download_rounded, size: 80, color: iconColor);
+        iconWidget = _GlowIcon(
+          icon: Icons.download_rounded,
+          gradient: [_C.violet, _C.cyan],
+          size: 88,
+        );
         break;
+
       case DownloadStatus.checkingAccess:
       case DownloadStatus.authenticating:
-        iconWidget = SizedBox(
-          width: 80,
-          height: 80,
-          child: CircularProgressIndicator(
-            strokeWidth: 4,
-            valueColor: AlwaysStoppedAnimation<Color>(iconColor),
-          ),
-        );
+        iconWidget = _PulsingRing(color: _C.cyan);
         break;
+
       case DownloadStatus.downloading:
+        iconWidget = _GlowIcon(
+          icon: Icons.cloud_download_rounded,
+          gradient: [_C.cyan, _C.violet],
+          size: 88,
+          pulse: true,
+        );
+        break;
+
       case DownloadStatus.paused:
-        iconWidget = Icon(
-          status == DownloadStatus.paused
-              ? Icons.pause_rounded
-              : Icons.download_rounded,
-          size: 80,
-          color: iconColor,
+        iconWidget = _GlowIcon(
+          icon: Icons.pause_circle_rounded,
+          gradient: [_C.amber, const Color(0xFFD97706)],
+          size: 88,
         );
         break;
+
       case DownloadStatus.completed:
-        iconWidget = Container(
-          width: 80,
-          height: 80,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
-            ),
-          ),
-          child: const Icon(Icons.check_rounded, size: 40, color: Colors.white),
+        iconWidget = _GlowIcon(
+          icon: Icons.check_circle_rounded,
+          gradient: [_C.green, const Color(0xFF059669)],
+          size: 88,
         );
         break;
+
       case DownloadStatus.awaitingLicenseAcceptance:
-        iconWidget = Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [Colors.orange[400]!, Colors.orange[600]!],
-            ),
-          ),
-          child: const Icon(
-            Icons.assignment_rounded,
-            size: 40,
-            color: Colors.white,
-          ),
+        iconWidget = _GlowIcon(
+          icon: Icons.assignment_rounded,
+          gradient: [_C.amber, _C.pink],
+          size: 88,
         );
         break;
     }
 
-    // Smooth transition between different icons
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
+      switchInCurve: Curves.easeOutBack,
+      transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: FadeTransition(opacity: anim, child: child)),
       child: iconWidget,
     );
   }
 
-  /// Status-aware message with dynamic content and progress percentage
+  // ── Status message ─────────────────────────────────────────────────────────
   static Widget buildStatusMessage(
     DownloadStatus status,
     DownloadProgress? progress,
@@ -155,136 +165,183 @@ class ModernUIWidgets {
   ) {
     String title;
     String subtitle;
-    Color textColor = Colors.grey[800]!;
+    Color accentColor = _C.violet;
 
     switch (status) {
       case DownloadStatus.notStarted:
-        title = "Ready to Download";
+        title = 'Ready to Download';
         subtitle =
-            "You'll need to create a free Hugging Face account to accept the model license and download. Requires around 4GB of storage space.";
+            'Create a free Hugging Face account to accept the model license and download. Requires ~4 GB storage.';
+        accentColor = _C.violet;
         break;
       case DownloadStatus.checkingAccess:
-        title = "Checking Access";
-        subtitle = "Verifying model availability and permissions...";
+        title = 'Checking Access';
+        subtitle = 'Verifying model availability and permissions…';
+        accentColor = _C.cyan;
         break;
       case DownloadStatus.authenticating:
-        title = "Authenticating";
-        subtitle = "Connecting to your Hugging Face account...";
+        title = 'Authenticating';
+        subtitle = 'Connecting to your Hugging Face account…';
+        accentColor = _C.cyan;
         break;
       case DownloadStatus.awaitingLicenseAcceptance:
-        title = "License Agreement Required";
+        title = 'License Required';
         subtitle =
-            "Please review and accept the model license agreement on Hugging Face to proceed with the download";
+            'Review and accept the model license on Hugging Face to proceed with the download.';
+        accentColor = _C.amber;
         break;
       case DownloadStatus.downloading:
-        title = "Downloading";
+        title = 'Downloading Model';
         subtitle =
-            "This may take a few minutes to half an hour on slower connections - please do not close the app. The progress bar updates in increments and may seem frozen at times, but the download is still working.";
+            'Stay patient — this can take minutes to half an hour on slower connections. Do not close the app.';
+        accentColor = _C.cyan;
         break;
       case DownloadStatus.paused:
-        title = "Download Paused";
-        subtitle =
-            "Your download has been paused. Tap Resume to continue downloading.";
+        title = 'Download Paused';
+        subtitle = 'Your download is paused. Tap Resume to continue.';
+        accentColor = _C.amber;
         break;
       case DownloadStatus.completed:
-        title = "Download Complete!";
-        subtitle =
-            "The AI model is ready to use. You can now start chatting offline.";
+        title = 'Model Ready!';
+        subtitle = 'The AI model is loaded and ready. Starting your experience…';
+        accentColor = _C.green;
         break;
       case DownloadStatus.failed:
-        title = "Download Failed";
-        // Use the most recent error message if available
+        title = 'Download Failed';
         subtitle = errorMessages.isNotEmpty
-            ? "${errorMessages.last} Please try again or check your connection."
-            : "Something went wrong during the download. Please try again.";
+            ? '${errorMessages.last} Please try again or check your connection.'
+            : 'Something went wrong. Please try again.';
+        accentColor = _C.red;
         break;
       case DownloadStatus.cancelled:
-        title = "Ready to Download";
+        title = 'Ready to Download';
         subtitle =
-            "You'll need to create a free Hugging Face account to accept the model license and download. Requires around 4GB of storage space.";
+            'Create a free Hugging Face account to accept the model license and download. Requires ~4 GB storage.';
+        accentColor = _C.violet;
         break;
     }
 
     return Column(
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 16,
-            color: textColor.withOpacity(0.7),
-            height: 1.4,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        // Show large percentage display during active downloads
-        if (progress != null &&
-            (status == DownloadStatus.downloading ||
-                status == DownloadStatus.paused)) ...[
-          const SizedBox(height: 20),
-          Text(
-            "${progress.progressPercent}%",
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              color: textColor,
+        ShaderMask(
+          shaderCallback: (bounds) => LinearGradient(
+            colors: [accentColor, _C.textHi],
+          ).createShader(bounds),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: -0.5,
             ),
             textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 15,
+            color: _C.textMid,
+            height: 1.55,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        // Big percentage pill during active download
+        if (progress != null &&
+            (status == DownloadStatus.downloading || status == DownloadStatus.paused)) ...[
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(color: accentColor.withOpacity(0.3)),
+            ),
+            child: Text(
+              '${progress.progressPercent}%',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.w900,
+                color: accentColor,
+                letterSpacing: -1,
+              ),
+            ),
           ),
         ],
       ],
     );
   }
 
-  /// Progress bar with left-aligned fill and status-based colors
-  static Widget buildProgressBar(
-    DownloadProgress? progress,
-    DownloadStatus status,
-  ) {
+  // ── Progress bar ───────────────────────────────────────────────────────────
+  static Widget buildProgressBar(DownloadProgress? progress, DownloadStatus status) {
     if (progress == null ||
-        (status != DownloadStatus.downloading &&
-            status != DownloadStatus.paused)) {
+        (status != DownloadStatus.downloading && status != DownloadStatus.paused)) {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      width: double.infinity,
-      height: 8,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        color: Colors.grey[200],
-      ),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: FractionallySizedBox(
-          widthFactor: progress.progress,
-          child: Container(
-            height: 8,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              // Different colors for paused vs active downloads
-              gradient: LinearGradient(
-                colors: status == DownloadStatus.paused
-                    ? [Colors.orange[400]!, Colors.orange[600]!]
-                    : [const Color(0xFF2196F3), const Color(0xFF1976D2)],
+    final isPaused = status == DownloadStatus.paused;
+    final colors = isPaused
+        ? [_C.amber, const Color(0xFFD97706)]
+        : [_C.violet, _C.cyan];
+
+    return Column(
+      children: [
+        Stack(
+          children: [
+            // Track
+            Container(
+              height: 8,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: _C.surface2,
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
-          ),
+            // Fill
+            FractionallySizedBox(
+              widthFactor: progress.progress,
+              child: Container(
+                height: 8,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(colors: colors),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.last.withOpacity(0.6),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
+        const SizedBox(height: 10),
+        // Speed / ETA info row
+        if (progress.downloadRate > 0 || progress.remainingTime.inSeconds > 0)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (progress.downloadRate > 0)
+                Text(
+                  '${(progress.downloadRate / 1024 / 1024).toStringAsFixed(1)} MB/s',
+                  style: const TextStyle(color: _C.textLo, fontSize: 12),
+                ),
+              if (progress.remainingTime.inSeconds > 0)
+                Text(
+                  _formatDuration(progress.remainingTime),
+                  style: const TextStyle(color: _C.textLo, fontSize: 12),
+                ),
+            ],
+          ),
+      ],
     );
   }
 
-  /// Status-dependent action buttons with automatic navigation for completed downloads
+  // ── Action buttons ─────────────────────────────────────────────────────────
   static Widget buildActionButtons(
     DownloadStatus status,
     VoidCallback onStartDownload,
@@ -299,8 +356,9 @@ class ModernUIWidgets {
       case DownloadStatus.cancelled:
         return _buildGradientButton(
           onPressed: onStartDownload,
-          text: 'Download',
+          text: 'Download Model',
           icon: Icons.download_rounded,
+          gradientColors: [_C.violet, _C.cyan],
           width: double.infinity,
         );
 
@@ -309,6 +367,7 @@ class ModernUIWidgets {
           onPressed: onStartDownload,
           text: 'Start Download',
           icon: Icons.download_rounded,
+          gradientColors: [_C.amber, _C.pink],
           width: double.infinity,
         );
 
@@ -320,16 +379,16 @@ class ModernUIWidgets {
                 onPressed: onPauseDownload,
                 text: 'Pause',
                 icon: Icons.pause_rounded,
-                isSecondary: true,
+                gradientColors: [const Color(0xFF374151), const Color(0xFF4B5563)],
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: _buildGradientButton(
                 onPressed: onCancelDownload,
                 text: 'Cancel',
                 icon: Icons.close_rounded,
-                gradientColors: [Colors.red[400]!, Colors.red[600]!],
+                gradientColors: [_C.red, const Color(0xFFDC2626)],
               ),
             ),
           ],
@@ -338,13 +397,13 @@ class ModernUIWidgets {
       case DownloadStatus.paused:
         return _buildGradientButton(
           onPressed: onResumeDownload,
-          text: 'Resume',
+          text: 'Resume Download',
           icon: Icons.play_arrow_rounded,
+          gradientColors: [_C.amber, _C.pink],
           width: double.infinity,
         );
 
       case DownloadStatus.completed:
-        // Auto-navigate instead of showing button
         WidgetsBinding.instance.addPostFrameCallback((_) => onGoToChat());
         return const SizedBox.shrink();
 
@@ -353,92 +412,93 @@ class ModernUIWidgets {
     }
   }
 
+  // ── Logs button ────────────────────────────────────────────────────────────
   static Widget buildLogsButton(BuildContext context, VoidCallback onPressed) {
     return Container(
-      margin: const EdgeInsets.only(top: 16, right: 16),
-      child: Align(
-        alignment: Alignment.topRight,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[300]!),
-          ),
-          child: IconButton(
-            icon: Icon(Icons.list_alt_rounded, color: Colors.grey[700]),
-            onPressed: onPressed,
-            tooltip: 'View Logs',
-          ),
-        ),
+      decoration: BoxDecoration(
+        color: _C.surface.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _C.border),
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.list_alt_rounded, color: _C.textMid, size: 20),
+        onPressed: onPressed,
+        tooltip: 'View Logs',
+        padding: const EdgeInsets.all(10),
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
       ),
     );
   }
 
-  /// Modal bottom sheet for license agreement with proper styling
+  // ── License bottom sheet ───────────────────────────────────────────────────
   static Widget buildLicenseBottomSheet(
     BuildContext context,
     VoidCallback onCancel,
     VoidCallback onViewLicense,
   ) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: _C.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        border: Border.all(color: _C.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, -5),
+            color: _C.violet.withOpacity(0.15),
+            blurRadius: 40,
+            offset: const Offset(0, -10),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar for bottom sheet
+          // Drag handle
           Container(
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: _C.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
+          // Icon
           Container(
-            width: 64,
-            height: 64,
+            width: 68,
+            height: 68,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [Colors.orange[400]!, Colors.orange[600]!],
+              gradient: const LinearGradient(
+                colors: [_C.amber, _C.pink],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: _C.amber.withOpacity(0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            child: const Icon(
-              Icons.assignment_rounded,
-              size: 32,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.assignment_rounded, size: 32, color: Colors.white),
           ),
-          const SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 20),
+          const Text(
             'License Agreement Required',
             style: TextStyle(
               fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              fontWeight: FontWeight.w800,
+              color: _C.textHi,
+              letterSpacing: -0.4,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
-          Text(
-            'This model requires acceptance of license terms on Hugging Face. Please review and accept the license agreement to continue with the download.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              height: 1.4,
-            ),
+          const Text(
+            'This model requires acceptance of license terms on Hugging Face. Please review and accept to continue.',
+            style: TextStyle(fontSize: 15, color: _C.textMid, height: 1.5),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
@@ -449,21 +509,167 @@ class ModernUIWidgets {
                   onPressed: onCancel,
                   text: 'Cancel',
                   icon: Icons.close_rounded,
-                  gradientColors: [Colors.grey[400]!, Colors.grey[500]!],
+                  gradientColors: [const Color(0xFF374151), const Color(0xFF4B5563)],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: _buildGradientButton(
                   onPressed: onViewLicense,
                   text: 'View License',
                   icon: Icons.open_in_new_rounded,
-                  gradientColors: [Colors.orange[400]!, Colors.orange[600]!],
+                  gradientColors: [_C.amber, _C.pink],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  /// Format a Duration into a human-readable ETA string
+  static String _formatDuration(Duration d) {
+    if (d.inHours > 0) return '${d.inHours}h ${d.inMinutes.remainder(60)}m left';
+    if (d.inMinutes > 0) return '${d.inMinutes}m ${d.inSeconds.remainder(60)}s left';
+    return '${d.inSeconds}s left';
+  }
+}
+
+// ─── Internal animated widgets ────────────────────────────────────────────────
+
+/// Glowing icon with gradient circle backdrop
+class _GlowIcon extends StatefulWidget {
+  final IconData icon;
+  final List<Color> gradient;
+  final double size;
+  final bool pulse;
+  const _GlowIcon({required this.icon, required this.gradient, required this.size, this.pulse = false});
+
+  @override
+  State<_GlowIcon> createState() => _GlowIconState();
+}
+
+class _GlowIconState extends State<_GlowIcon> with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(duration: const Duration(milliseconds: 1600), vsync: this);
+    _scaleAnim = Tween<double>(begin: 1.0, end: 1.08).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+    if (widget.pulse) _ctrl.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final boxSize = widget.size * 1.2;
+    return AnimatedBuilder(
+      animation: _scaleAnim,
+      builder: (_, child) => Transform.scale(scale: widget.pulse ? _scaleAnim.value : 1.0, child: child),
+      child: Container(
+        width: boxSize,
+        height: boxSize,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: widget.gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: widget.gradient.first.withOpacity(0.45),
+              blurRadius: 36,
+              offset: const Offset(0, 12),
+            ),
+            BoxShadow(
+              color: widget.gradient.last.withOpacity(0.25),
+              blurRadius: 60,
+              spreadRadius: -4,
+            ),
+          ],
+        ),
+        child: Icon(widget.icon, color: Colors.white, size: widget.size * 0.48),
+      ),
+    );
+  }
+}
+
+/// Spinning ring for auth / checking states
+class _PulsingRing extends StatefulWidget {
+  final Color color;
+  const _PulsingRing({required this.color});
+
+  @override
+  State<_PulsingRing> createState() => _PulsingRingState();
+}
+
+class _PulsingRingState extends State<_PulsingRing> with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(duration: const Duration(seconds: 2), vsync: this)..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 106,
+      height: 106,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Outer glow ring
+          Container(
+            width: 106,
+            height: 106,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: widget.color.withOpacity(0.15), width: 2),
+            ),
+          ),
+          // Spinner
+          RotationTransition(
+            turns: _ctrl,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: SweepGradient(
+                  colors: [widget.color, widget.color.withOpacity(0.0)],
+                ),
+              ),
+            ),
+          ),
+          // Center dot
+          Container(
+            width: 70,
+            height: 70,
+            decoration: const BoxDecoration(
+              color: Color(0xFF0A0A14),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.cloud_rounded, color: widget.color, size: 32),
+          ),
         ],
       ),
     );
