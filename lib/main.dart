@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Gemma Vision',
+      title: 'Blind Vision Assistant',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
 
       // Set the initial page to the model download screen
