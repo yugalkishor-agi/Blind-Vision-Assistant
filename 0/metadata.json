@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4MYSCGMHZTB85SGEER2BCF2",
+  "session_id": "39973ef4-accb-4a06-ae2e-3b503a58a5e2",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-11T07:45:41.3710043Z",
+  "branch": "main",
+  "checkpoints_count": 5,
+  "files_touched": [
+    "hackathon.md",
+    "skills/upload_traces.py"
+  ],
+  "agent": "Antigravity",
+  "model": "",
+  "turn_id": "7147f5e04755",
+  "token_usage": {
+    "input_tokens": 57005,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1347402,
+    "output_tokens": 6419,
+    "api_call_count": 43
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-11T07:45:41.3233858Z",
+    "agent_lines": 220,
+    "agent_removed": 5,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 220,
+    "total_lines_changed": 225,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 38,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".agents/neatlogsprompt.txt.txt": 38
+      }
+    }
+  ]
+}
