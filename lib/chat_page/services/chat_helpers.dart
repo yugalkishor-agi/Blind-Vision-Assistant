@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/message_models.dart';
 import '../widgets/prompt_bar.dart';
@@ -153,6 +154,10 @@ class ChatHelpers {
       );
 
       await controller.initialize();
+      // Gemma's image decoder does not reliably honor camera EXIF rotation.
+      // Lock the capture orientation so the saved pixels are upright for both
+      // the normal vision flow and the agentic flow.
+      await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
       final image = await controller.takePicture();
       return File(image.path);
     } catch (e) {

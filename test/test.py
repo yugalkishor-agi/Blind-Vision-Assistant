@@ -1,7 +1,7 @@
 import base64
 from openai import OpenAI
 
-client = OpenAI(base_url="https://council-ensure-broad-extended.trycloudflare.com/v1", api_key="APNI-SECRET-KEY")
+client = OpenAI(base_url="https://year-southeast-michael-fold.trycloudflare.com/v1", api_key="APNI-SECRET-KEY")
 b64 = lambda p: base64.b64encode(open(p, "rb").read()).decode()
 
 # image
