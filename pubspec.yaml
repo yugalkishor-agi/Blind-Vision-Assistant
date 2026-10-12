@@ -52,13 +52,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+# Pin background_downloader to 9.5.9 — version 9.6.4 (pulled by flutter_gemma)
+# has a Kotlin compilation bug (Unresolved reference 'filterNotNull' etc.).
+dependency_overrides:
+  background_downloader: 9.5.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

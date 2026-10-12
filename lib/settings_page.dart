@@ -20,7 +20,15 @@ const _sBorderW = 2.0;
 class SettingsPage extends StatefulWidget {
   final String systemContext;
   final PreferredBackend backend;
-  const SettingsPage({Key? key, required this.systemContext, required this.backend}) : super(key: key);
+  final bool useRemoteModel;
+  final String remoteUrl;
+  const SettingsPage({
+    Key? key,
+    required this.systemContext,
+    required this.backend,
+    this.useRemoteModel = false,
+    this.remoteUrl = '',
+  }) : super(key: key);
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -28,7 +36,9 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   late TextEditingController _sysCtrl;
+  late TextEditingController _remoteUrlCtrl;
   late PreferredBackend _selectedBackend;
+  late bool _useRemoteModel;
   bool _hasChanges = false;
 
   bool get _isIOS => !kIsWeb && Platform.isIOS;
@@ -40,14 +50,19 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _sysCtrl = TextEditingController(text: widget.systemContext);
+    _remoteUrlCtrl = TextEditingController(text: widget.remoteUrl);
     _selectedBackend = widget.backend;
+    _useRemoteModel = widget.useRemoteModel;
     _sysCtrl.addListener(_onChange);
+    _remoteUrlCtrl.addListener(_onChange);
   }
 
   @override
   void dispose() {
     _sysCtrl.removeListener(_onChange);
+    _remoteUrlCtrl.removeListener(_onChange);
     _sysCtrl.dispose();
+    _remoteUrlCtrl.dispose();
     _pageScope.dispose();
     SemanticButtonRegistry.clear();
     super.dispose();
@@ -55,8 +70,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _onChange() {
     setState(() {
-      _hasChanges = _sysCtrl.text.trim() != widget.systemContext.trim() ||
-          _selectedBackend != widget.backend;
+      _hasChanges =
+          _sysCtrl.text.trim() != widget.systemContext.trim() ||
+          _selectedBackend != widget.backend ||
+          _useRemoteModel != widget.useRemoteModel ||
+          _remoteUrlCtrl.text.trim() != widget.remoteUrl.trim();
     });
   }
 
@@ -64,14 +82,19 @@ class _SettingsPageState extends State<SettingsPage> {
     if (b == null) return;
     setState(() {
       _selectedBackend = b;
-      _hasChanges = _sysCtrl.text.trim() != widget.systemContext.trim() ||
-          _selectedBackend != widget.backend;
+      _hasChanges =
+          _sysCtrl.text.trim() != widget.systemContext.trim() ||
+          _selectedBackend != widget.backend ||
+          _useRemoteModel != widget.useRemoteModel ||
+          _remoteUrlCtrl.text.trim() != widget.remoteUrl.trim();
     });
   }
 
   void _save() => Navigator.of(context).pop({
     'systemContext': _sysCtrl.text.trim(),
     'backend': _selectedBackend,
+    'useRemoteModel': _useRemoteModel,
+    'remoteUrl': _remoteUrlCtrl.text.trim(),
   });
   void _cancel() => Navigator.of(context).pop();
 
@@ -130,6 +153,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     _buildControllerSetup(),
                     const SizedBox(height: 32),
                     _buildBackendSelector(),
+                    const SizedBox(height: 32),
+                    _buildRemoteModelSection(),
                     const SizedBox(height: 36),
                     _buildActionRow(),
                   ],
@@ -473,6 +498,143 @@ class _SettingsPageState extends State<SettingsPage> {
           fontWeight: FontWeight.w900, fontSize: 12,
           fontFamily: 'monospace', letterSpacing: 0.8,
         )),
+      ),
+    );
+  }
+
+  // ── Remote model section (dev/testing) ────────────────────────────────────
+  Widget _buildRemoteModelSection() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: _sPaper,
+        border: Border.fromBorderSide(BorderSide(color: _sInk, width: _sBorderW)),
+        boxShadow: [BoxShadow(color: _sInk, offset: Offset(3, 3), blurRadius: 0)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row with toggle
+          Container(
+            width: double.infinity,
+            color: _sInk,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'REMOTE MODEL  (DEV / TESTING)',
+                    style: TextStyle(
+                      fontSize: 9, color: _sCream,
+                      fontWeight: FontWeight.w900, letterSpacing: 1.5,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+                // Toggle switch
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _useRemoteModel = !_useRemoteModel;
+                      _onChange();
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 44,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: _useRemoteModel ? _sAccent : const Color(0xFF555050),
+                      border: Border.all(color: _sCream, width: 1.5),
+                    ),
+                    child: Align(
+                      alignment: _useRemoteModel
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: Container(
+                        width: 18, height: 18,
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        color: _sCream,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _useRemoteModel
+                      ? 'ON — app will call your Ollama server instead of the on-device model.'
+                      : 'OFF — using on-device Gemma model (production mode).',
+                  style: const TextStyle(
+                    fontSize: 12, color: _sInkSoft,
+                    fontFamily: 'monospace', height: 1.5,
+                  ),
+                ),
+
+                if (_useRemoteModel) ...[
+                  const SizedBox(height: 14),
+                  const Text(
+                    'OLLAMA URL',
+                    style: TextStyle(
+                      fontSize: 9, color: _sAccent,
+                      fontWeight: FontWeight.w700, letterSpacing: 1.2,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Semantics(
+                    label: 'Remote model URL text field',
+                    textField: true,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: _sCream,
+                        border: Border.fromBorderSide(
+                            BorderSide(color: _sInk, width: _sBorderW)),
+                      ),
+                      child: TextField(
+                        controller: _remoteUrlCtrl,
+                        style: const TextStyle(
+                          color: _sInk, fontSize: 12,
+                          fontFamily: 'monospace',
+                        ),
+                        cursorColor: _sAccent,
+                        autocorrect: false,
+                        keyboardType: TextInputType.url,
+                        decoration: const InputDecoration(
+                          hintText:
+                              'https://xxxx.trycloudflare.com',
+                          hintStyle: TextStyle(
+                            color: _sInkMute, fontSize: 12,
+                            fontFamily: 'monospace',
+                          ),
+                          filled: false,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.all(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'App calls  <URL>/v1/chat/completions  (Ollama OpenAI-compatible)',
+                    style: TextStyle(
+                      fontSize: 9, color: _sInkMute,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

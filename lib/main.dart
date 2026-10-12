@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:blind_vision_assistant/download_page/model_download_page.dart';
+import 'package:blind_vision_assistant/chat_page/gemma_vision_chat.dart';
+import 'package:blind_vision_assistant/chat_page/services/remote_settings_manager.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 /// Top-level callback function for handling download progress updates.
@@ -123,7 +125,57 @@ class MyApp extends StatelessWidget {
           bodySmall:     TextStyle(color: Color(0xFF666050), fontFamily: 'monospace'),
         ),
       ),
-      home: const ModelDownloadPage(),
+      home: const _AppRouter(),
+    );
+  }
+}
+
+/// Checks remote settings on startup and routes to the correct page.
+/// - Remote mode ON + URL set → ChatPage (skip download entirely)
+/// - Otherwise → ModelDownloadPage (normal flow)
+class _AppRouter extends StatefulWidget {
+  const _AppRouter();
+  @override
+  State<_AppRouter> createState() => _AppRouterState();
+}
+
+class _AppRouterState extends State<_AppRouter> {
+  @override
+  void initState() {
+    super.initState();
+    _route();
+  }
+
+  Future<void> _route() async {
+    final isRemote = await RemoteSettingsManager.isRemoteEnabled();
+    if (!mounted) return;
+    if (isRemote) {
+      // Remote mode — skip download page, go straight to chat
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const ChatPage()),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const ModelDownloadPage()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Brief loading screen while we check SharedPreferences
+    return const Scaffold(
+      backgroundColor: Color(0xFFF5F0E8),
+      body: Center(
+        child: SizedBox(
+          width: 32,
+          height: 32,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Color(0xFFE8441A),
+          ),
+        ),
+      ),
     );
   }
 }

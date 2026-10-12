@@ -6,6 +6,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_gemma/pigeon.g.dart';
 
 import 'gemma_service.dart';
+import 'gemma_service_interface.dart';
+import 'remote_gemma_service.dart';
 import 'streaming_tts_service.dart';
 import 'chat_helpers.dart';
 import 'speech_service.dart';
@@ -38,6 +40,8 @@ class BootstrapManager {
     required bool Function() isMounted,
     required bool Function() isDisposed,
     required void Function(VoidCallback) setState,
+    bool useRemoteModel = false,
+    String remoteUrl = '',
   }) async {
     // Prevent concurrent bootstrap attempts (causes deadlocks with AI model loading)
     if (_globalBootstrapping) {
@@ -87,7 +91,7 @@ class BootstrapManager {
 
       // Step 1: Initialize TTS services (needed by other services)
       final tts = FlutterTts();
-      await tts.setSpeechRate(0.5);
+      await tts.setSpeechRate(0.65);
       final streamingTts = StreamingTtsService(tts);
       debugPrint("[BootstrapManager] TTS initialized");
 
@@ -129,8 +133,14 @@ class BootstrapManager {
       debugPrint("[BootstrapManager] Speech service initialized");
 
       // Step 4: Initialize chat helpers (depends on all previous services)
+      // Resolve which service to use — remote (Ollama) or on-device Gemma.
+      final GemmaServiceInterface gemmaService =
+          (useRemoteModel && remoteUrl.trim().isNotEmpty)
+          ? RemoteGemmaService(baseUrl: remoteUrl.trim())
+          : GemmaService.instance;
+
       final chatHelpers = ChatHelpers(
-        service: GemmaService.instance,
+        service: gemmaService,
         streamingTts: streamingTts,
         speechService: speechService,
         textRecognition: textRecognition,
@@ -168,8 +178,10 @@ class BootstrapManager {
       debugPrint("[BootstrapManager] Keyboard handler initialized");
 
       // Step 7: Initialize AI model (heaviest operation, can fail)
-      debugPrint("[BootstrapManager] Initializing Gemma service...");
-      await GemmaService.instance.init(backend);
+      debugPrint(
+        "[BootstrapManager] Initializing Gemma service (remote: ${gemmaService.isRemote})...",
+      );
+      await gemmaService.init(backend);
 
       if (!isMounted() || isDisposed()) {
         debugPrint("[BootstrapManager] Not mounted after Gemma init");

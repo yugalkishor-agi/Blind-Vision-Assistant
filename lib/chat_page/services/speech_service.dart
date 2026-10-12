@@ -157,7 +157,7 @@ class SpeechService {
         _promptBarKey.currentState?.updateText(val.recognizedWords.trim());
       },
       listenFor: const Duration(minutes: 5), // Long session for complex prompts
-      pauseFor: const Duration(seconds: 60), // Handle pauses in speech
+      pauseFor: const Duration(seconds: 2),   // Stop quickly after user finishes speaking
       partialResults: true, // Show text as it's being recognized
       cancelOnError: false, // Continue listening despite errors
       listenMode: ListenMode.dictation, // Optimized for text dictation

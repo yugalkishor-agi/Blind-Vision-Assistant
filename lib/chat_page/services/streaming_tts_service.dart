@@ -43,7 +43,8 @@ class StreamingTtsService {
   }
 
   void _configureTts() {
-    _tts.setSpeechRate(0.5);
+    // 0.5 makes streamed responses noticeably slow on mobile voices.
+    _tts.setSpeechRate(0.65);
     _tts.setVolume(0.9);
     _tts.setPitch(1.0);
     _tts.awaitSpeakCompletion(true);
@@ -215,6 +216,10 @@ class StreamingTtsService {
         if (unspoken.trim().isEmpty) {
           isSpeaking.value = false;
           if (_isLoading) await SoundManager.instance.resumeLoading();
+        } else {
+          // Tokens may have arrived while the previous segment was speaking.
+          // Re-scan the buffer now so TTS does not wait for the full response.
+          await _processBuffer();
         }
       }
     }

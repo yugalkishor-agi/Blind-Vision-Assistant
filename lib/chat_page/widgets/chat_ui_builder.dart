@@ -213,6 +213,7 @@ class ChatUIBuilder {
     required bool isGenerating,
     required bool isSpeaking,
     Future<void> Function()? onStopTts,
+    Future<void> Function(String)? onPromptWithAgent, // NEW — agent mode button
   }) {
     if (isGenerating || isSpeaking) {
       return _buildStatusWidget(isGenerating: isGenerating, isSpeaking: isSpeaking);
@@ -225,6 +226,7 @@ class ChatUIBuilder {
         key: promptBarKey,
         onPromptWithPhoto: onPromptWithPhoto,
         onPromptTextOnly: onPromptTextOnly,
+        onPromptWithAgent: onPromptWithAgent,
         disabled: disabled,
         speechEnabled: speechEnabled,
         listening: listening,

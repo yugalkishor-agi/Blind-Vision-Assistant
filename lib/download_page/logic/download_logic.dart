@@ -190,27 +190,30 @@ class DownloadPageLogic {
   }
 
   /// Initiates the download process, handling authentication if required.
-  /// This is the main entry point for starting a new download.
-  Future<void> startDownload() async {
+  /// If [customUrl] is provided (dev/testing mode), skips auth and downloads directly.
+  Future<void> startDownload({String? customUrl}) async {
     setDownloadStatus(DownloadStatus.checkingAccess);
-    setErrorMessages([]); // Clear any previous errors
+    setErrorMessages([]);
+
+    // ── Dev mode: custom URL bypasses all auth ────────────────────────────
+    if (customUrl != null && customUrl.trim().isNotEmpty) {
+      Logger.info('Custom URL provided, skipping auth: $customUrl');
+      await downloadModel(null, customUrl: customUrl.trim());
+      return;
+    }
 
     Logger.info('Starting download process for $modelFullName');
 
-    // First, check if the model requires authentication
     final responseCode = await DownloadManager.checkModelAccess(downloadUrl);
 
     if (responseCode == 200) {
-      // Public model - can download directly without authentication
       await downloadModel(null);
       return;
     } else if (responseCode < 0) {
-      // Network error occurred during access check
       handleError('Network error. Please check your connection.');
       return;
     }
 
-    // Model requires authentication - proceed with auth flow
     await handleAuthentication();
   }
 
@@ -332,24 +335,25 @@ class DownloadPageLogic {
   }
 
   /// Actually starts the file download process.
-  /// This is called after authentication is complete (if required).
-  Future<void> downloadModel(String? accessToken) async {
+  /// [accessToken] is used for HuggingFace auth.
+  /// [customUrl] overrides the default URL — used in dev/testing mode.
+  Future<void> downloadModel(String? accessToken, {String? customUrl}) async {
     setDownloadStatus(DownloadStatus.downloading);
 
-    // Clean up any failed downloads from previous attempts
     await DownloadManager.cleanupFailedDownloads();
 
-    // Start the actual download with flutter_downloader
+    final urlToUse = customUrl ?? downloadUrl;
+    Logger.info('Downloading from: $urlToUse');
+
     final taskId = await DownloadManager.startDownload(
-      url: downloadUrl,
+      url: urlToUse,
       fileName: modelName,
       accessToken: accessToken,
     );
 
     if (taskId != null) {
-      // Save that we have a download in progress for crash recovery
       await DownloadStateManager.saveDownloadInProgress(taskId);
-      monitorDownload(taskId, null); // Start monitoring progress
+      monitorDownload(taskId, null);
     } else {
       handleError('Failed to start download');
     }

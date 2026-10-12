@@ -4,7 +4,7 @@
 
 # An Offline AI Assistant for Blind Users, Built on Gemma 3n
 
-*Team VedX (Yugal Kishor and Harshvardhan singh ) | NeatLogic Hackathon*
+*Team VedX (Yugal Kishor and Harshvardhan singh ) | neatlogs Hackathon*
 
 An app that helps blind users with navigation and shopping. Everything runs on the phone: no internet needed, and no photo ever leaves the device.
 
@@ -155,4 +155,4 @@ I also added lots of sound effects:
 
 The whole project came down to one idea: make something a blind person can really use on a normal day, without internet and without handing their photos to anyone. Thank you to my brother for the testing, the patience and the honest feedback.
 
-Yugal Kishor and Harshvardhan singh, Team VedX | NeatLogic Hackathon
+Yugal Kishor and Harshvardhan singh, Team VedX | neatlogs Hackathon

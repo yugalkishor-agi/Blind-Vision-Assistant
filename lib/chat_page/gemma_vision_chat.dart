@@ -7,6 +7,7 @@ import 'package:flutter_gemma/pigeon.g.dart';
 import 'widgets/prompt_bar.dart';
 import 'services/bootstrap_manager.dart';
 import 'services/chat_helpers.dart';
+import 'services/remote_settings_manager.dart';
 import 'services/speech_service.dart';
 import 'services/streaming_tts_service.dart';
 import 'services/text_recognition_service.dart';
@@ -48,6 +49,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   String _systemCtx = SystemPrompts.blindUserNavigation;
   PreferredBackend _backend = PreferredBackend.cpu;
 
+  /// Remote model settings (for emulator testing)
+  bool _useRemoteModel = false;
+  String _remoteUrl = '';
+
   /* UI control */
   final _promptBarKey = GlobalKey<PromptBarState>();
   bool _initialising = true;
@@ -71,7 +76,19 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _initAnimations();
-    _bootstrap(); // Start service initialization
+    _loadSettingsThenBootstrap();
+  }
+
+  /// Load persisted remote settings first, then bootstrap
+  Future<void> _loadSettingsThenBootstrap() async {
+    final saved = await RemoteSettingsManager.load();
+    if (mounted && !_disposed) {
+      setState(() {
+        _useRemoteModel = saved.useRemote;
+        _remoteUrl = saved.url;
+      });
+    }
+    _bootstrap();
   }
 
   /// Setup smooth page entry animations
@@ -134,6 +151,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             _scheduleAutoScroll(); // Auto-scroll when messages update
           }
         },
+        useRemoteModel: _useRemoteModel,
+        remoteUrl: _remoteUrl,
       );
 
       // Clean up temporary services before replacing with bootstrap results
@@ -212,6 +231,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   Future<void> _captureAndSend(String prompt) async =>
       await _chatHelpers!.captureAndSend(prompt, _msgs);
 
+  Future<void> _captureAndSendAgent(String prompt) async =>
+      await _chatHelpers!.captureAndSendAgent(prompt, _msgs);
+
   Future<void> _sendTextOnly(String prompt) async =>
       await _chatHelpers!.sendTextOnly(prompt, _msgs);
 
@@ -277,6 +299,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       promptBarKey: _promptBarKey,
                       onPromptWithPhoto: _captureAndSend,
                       onPromptTextOnly: _sendTextOnly,
+                      onPromptWithAgent: _captureAndSendAgent,
                       disabled:
                           _chatHelpers!.resetting || _chatHelpers!.isGenerating,
                       speechEnabled: _speechService!.speechEnabled,
@@ -302,29 +325,49 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(
-        builder: (context) =>
-            SettingsPage(systemContext: _systemCtx, backend: _backend),
+        builder: (context) => SettingsPage(
+          systemContext: _systemCtx,
+          backend: _backend,
+          useRemoteModel: _useRemoteModel,
+          remoteUrl: _remoteUrl,
+        ),
       ),
     );
 
-    // Process settings changes with full re-bootstrap if backend changed
+    // Process settings changes with full re-bootstrap if anything requiring
+    // re-init changed (backend, remote toggle, or remote URL).
     if (result != null && mounted && !_disposed) {
       final newSystemContext = result['systemContext'] as String?;
       final newBackend = result['backend'] as PreferredBackend?;
+      final newUseRemote = result['useRemoteModel'] as bool?;
+      final newRemoteUrl = result['remoteUrl'] as String?;
 
       if (newSystemContext != null && newBackend != null) {
+        final needsReboot = _backend != newBackend ||
+            (newUseRemote != null && newUseRemote != _useRemoteModel) ||
+            (newRemoteUrl != null && newRemoteUrl != _remoteUrl);
+
+        // Persist remote settings immediately so next app start uses them
+        if (newUseRemote != null || newRemoteUrl != null) {
+          RemoteSettingsManager.save(
+            useRemote: newUseRemote ?? _useRemoteModel,
+            url: newRemoteUrl ?? _remoteUrl,
+          );
+        }
+
         setState(() {
           _systemCtx = newSystemContext;
+          if (newUseRemote != null) _useRemoteModel = newUseRemote;
+          if (newRemoteUrl != null) _remoteUrl = newRemoteUrl;
           _chatHelpers!.updateSystemContext(_systemCtx);
 
-          // Backend change requires full re-initialization
-          if (_backend != newBackend) {
+          if (needsReboot) {
             _backend = newBackend;
             _msgs.clear();
             _initialising = true;
             BootstrapManager.reset();
             _redirectedOnError = false;
-            _bootstrap(); // Re-initialize with new backend
+            _bootstrap(); // Re-initialize with new service
           }
         });
       }

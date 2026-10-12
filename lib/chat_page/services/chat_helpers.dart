@@ -7,14 +7,16 @@ import 'package:flutter/material.dart';
 import '../models/message_models.dart';
 import '../widgets/prompt_bar.dart';
 import '../config/system_prompts.dart';
-import 'gemma_service.dart';
+import '../agent/agent_orchestrator.dart';
+import '../agent/agent_types.dart';
+import 'gemma_service_interface.dart';
 import 'speech_service.dart';
 import 'streaming_tts_service.dart';
 import 'text_recognition_service.dart';
 
 /// Core chat operations with vision AI - handles camera, OCR, streaming responses, and TTS
 class ChatHelpers {
-  final GemmaService _service;
+  final GemmaServiceInterface _service;
   final StreamingTtsService _streamingTts;
   final SpeechService _speechService;
   final TextRecognitionService _textRecognition;
@@ -26,7 +28,7 @@ class ChatHelpers {
   bool _isGenerating = false;
 
   ChatHelpers({
-    required GemmaService service,
+    required GemmaServiceInterface service,
     required StreamingTtsService streamingTts,
     required SpeechService speechService,
     required TextRecognitionService textRecognition,
@@ -325,6 +327,148 @@ class ChatHelpers {
       await _announceError(errorMsg);
     }
   }
+
+  // ── Agent workflow ────────────────────────────────────────────────────────
+
+  /// Agentic capture-and-send — Gemma decides which tool to use AND whether
+  /// a camera image is needed at all.
+  ///
+  /// KEY CHANGE: Camera is NOT opened upfront. A lazy [captureImage] callback
+  /// is passed to the orchestrator, which calls it only if the chosen action
+  /// requires an image. General knowledge / conversational queries skip the
+  /// camera entirely → faster response.
+  Future<void> captureAndSendAgent(
+    String prompt,
+    List<ChatMessage> messages,
+  ) async {
+    if (_isGenerating) {
+      debugPrint('[Agent] Ignored duplicate request while turn is running');
+      return;
+    }
+
+    _isGenerating = true;
+
+    // Track whether we eventually captured an image (for UI bubble)
+    File? capturedImage;
+
+    try {
+      // Add user message immediately — no image yet, just text
+      // We'll update it with the image if one is captured later
+      final userMsg = ChatMessage.text(prompt, isUser: true);
+      messages.add(userMsg);
+      _onStateChanged();
+
+      // Streaming AI placeholder
+      final aiMsg = ChatMessage.text('', isUser: false, isStreaming: true);
+      messages.add(aiMsg);
+      _onStateChanged();
+
+      await _speechService.playWooshSound();
+      _onStateChanged();
+      await _streamingTts.startLoading();
+
+      final orchestrator = AgentOrchestrator(
+        gemma: _service,
+        ocr: _textRecognition,
+      );
+
+      await orchestrator.run(
+        userQuery: prompt,
+
+        // Lazy camera callback — only called when action needs an image
+        captureImage: () async {
+          final imageFile = await _captureWithEfficientCamera();
+          capturedImage = imageFile;
+          // Update the user message bubble to show the captured image
+          if (capturedImage != null) {
+            final idx = messages.indexOf(userMsg);
+            if (idx != -1) {
+              messages[idx] = ChatMessage.withImageFile(
+                prompt,
+                isUser: true,
+                imageFile: capturedImage,
+              );
+              _onStateChanged();
+            }
+          }
+          return imageFile;
+        },
+
+        onStateChanged: (state) {
+          switch (state) {
+            case AgentState.executingOcr:
+              _speechService.speak('Reading text');
+              break;
+            case AgentState.executingScene:
+              _speechService.speak('Analyzing scene');
+              break;
+            default:
+              break;
+          }
+          _onStateChanged();
+        },
+
+        onStatusMessage: (msg) {
+          aiMsg.text = msg;
+          _onStateChanged();
+        },
+
+        onToken: (tok) {
+          // Replace status text with first real token
+          final isStatusText = aiMsg.text == '' ||
+              aiMsg.text.startsWith('Reading') ||
+              aiMsg.text.startsWith('Analyzing') ||
+              aiMsg.text.startsWith('Deciding') ||
+              aiMsg.text.startsWith('Composing') ||
+              aiMsg.text.startsWith('Could you') ||
+              aiMsg.text.startsWith('Could not');
+          aiMsg.text = isStatusText ? tok : aiMsg.text + tok;
+          _streamingTts.addText(tok, aiMsg.text);
+
+          _agentTokenCounter++;
+          if (_agentTokenCounter % 3 == 0) _onStateChanged();
+        },
+
+        onComplete: (fullResponse) async {
+          aiMsg
+            ..text = fullResponse
+            ..isStreaming = false;
+          _isGenerating = false;
+          _agentTokenCounter = 0;
+          _onStateChanged();
+          await _streamingTts.onMessageComplete();
+        },
+
+        onError: (userFacingMessage) async {
+          await _streamingTts.stopLoading();
+          aiMsg
+            ..text = userFacingMessage
+            ..isStreaming = false;
+          _isGenerating = false;
+          _agentTokenCounter = 0;
+          _onStateChanged();
+          await _announceError(userFacingMessage);
+        },
+      );
+    } catch (e) {
+      await _streamingTts.stopLoading();
+      final errorMsg = 'Agent error: $e';
+      if (messages.isNotEmpty && !messages.last.isUser) {
+        messages.last
+          ..text = 'Error: $e'
+          ..isStreaming = false;
+      } else {
+        messages.add(ChatMessage.text('Error: $e', isUser: false));
+      }
+      _isGenerating = false;
+      _agentTokenCounter = 0;
+      _onStateChanged();
+      await _announceError(errorMsg);
+    }
+  }
+
+  /// Token counter for the agent path (kept separate from captureAndSend counter).
+  int _agentTokenCounter = 0;
 
   /* Quick action shortcuts for common blind user navigation tasks */
 

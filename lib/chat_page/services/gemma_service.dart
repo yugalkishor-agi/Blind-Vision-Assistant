@@ -7,12 +7,16 @@ import 'package:flutter_gemma/pigeon.g.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/message_models.dart';
+import 'gemma_service_interface.dart';
 
 /// Singleton service for Google's Gemma AI model - optimized for performance and memory efficiency
 /// Handles model loading, chat sessions, and streaming responses with minimal overhead
-class GemmaService {
+class GemmaService implements GemmaServiceInterface {
   GemmaService._internal();
   static final GemmaService instance = GemmaService._internal();
+
+  @override
+  bool get isRemote => false;
 
   final _gemma = FlutterGemmaPlugin.instance;
   InferenceModel? _model;
