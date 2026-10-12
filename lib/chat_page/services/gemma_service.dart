@@ -81,7 +81,15 @@ class GemmaService implements GemmaServiceInterface {
 
     // Add user message with optional image to chat history
     if (image != null) {
-      final bytes = await image.readAsBytes();
+      // Camera JPEGs can be large and may contain orientation/format details
+      // that the native Gemma vision encoder does not normalize reliably.
+      // Normalize locally to the format/size expected by Gemma 3 vision.
+      final rawBytes = await image.readAsBytes();
+      final processed = await ImageProcessor.processImage(
+        rawBytes,
+        originalFormat: ImageProcessor.detectFormat(rawBytes),
+      );
+      final bytes = processed.processedBytes;
       await _chat!.addQuery(
         Message.withImage(text: text, imageBytes: bytes, isUser: true),
       );

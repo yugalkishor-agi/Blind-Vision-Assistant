@@ -149,7 +149,9 @@ class ChatHelpers {
 
       controller = CameraController(
         description,
-        ResolutionPreset.high,
+        // Keep camera output comfortably below the local Gemma image
+        // processor limit; the processor resizes it again for vision input.
+        ResolutionPreset.medium,
         enableAudio: false, // No audio needed for vision AI
       );
 
