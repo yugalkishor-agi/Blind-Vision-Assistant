@@ -16,6 +16,18 @@ For navigation, that causes two real problems. First, the internet is often unre
 
 A lot of accessibility apps also fail because they try to do everything and end up hard to use. I went the other way. This app does one thing: it helps blind users with essential daily tasks like navigation and shopping.
 
+## 📥 Download and Build APK
+
+1. Download the project ZIP from [here](https://github.com/yugalkishor-agi/Blind-Vision-Assistant/archive/refs/heads/main.zip).
+2. Extract the downloaded ZIP file.
+3. Open a terminal inside the extracted project folder (the folder containing `pubspec.yaml`).
+4. Run the following commands:
+
+   ```bash
+   flutter pub get
+   flutter build apk
+   ```
+
 ## Solution Approach
 
 Gemma 3n is a big step for on-device AI with vision. Running everything locally removes the need for internet and the privacy worry in one go.
