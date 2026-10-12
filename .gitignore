@@ -31,9 +31,11 @@ showcase
 # Android build
 **/android/app/build/
 **/android/.gradle/
+**/android/app/src/debug/*.apk
 
 # Environment & credentials
 .metadata
 .env
 .env.*
 node_modules/
+sourcecode.zip

@@ -1,170 +1,203 @@
 <p align="center">
-  <img src=assets\logo.png width="320" height="260" alt="Team VedX">
+  <img src="assets/logo.png" width="320" height="260" alt="Team VedX logo">
 </p>
 
-# An Offline AI Assistant for Blind Users, Built on Gemma 3n
+# An Offline-First AI Assistant for Blind Users, Built on Gemma 3n
 
-*Team VedX (Yugal Kishor and Harshvardhan singh ) | neatlogs Hackathon*
+An accessibility-first AI vision assistant for blind and visually impaired users. The app combines on-device vision, OCR, voice input, streaming text-to-speech, and an agentic decision system to answer questions about the user's surroundings.
 
-An app that helps blind users with navigation and shopping. Everything runs on the phone: no internet needed, and no photo ever leaves the device.
+*Team VedX (Yugal Kishor and Harshvardhan Singh) | neatlogs Hackathon*
 
-## Motivation
+## Links
 
-AI has come a long way, but the flagship models still have two problems for this kind of use. They need a constant internet connection, and they are built as general-purpose chatbots, not as accessibility tools.
+- Website: [blindvisionassistant.vercel.app](https://blindvisionassistant.vercel.app)
+- Release assets: [GitHub Release](https://github.com/yugalkishor-agi/Blind-Vision-Assistant/releases/tag/release)
 
-For navigation, that causes two real problems. First, the internet is often unreliable exactly when you need it most. Second, sending sensitive photos over the internet is a privacy risk, because the images may be processed in other countries with different data protection rules.
+## Why we built this
 
-A lot of accessibility apps also fail because they try to do everything and end up hard to use. I went the other way. This app does one thing: it helps blind users with essential daily tasks like navigation and shopping.
+AI has come a long way, but most powerful assistants still depend on a constant internet connection and are designed as general-purpose chatbots rather than accessibility tools. For a blind user, that creates two serious problems: the internet may be unreliable exactly when help is needed, and sending personal photos to a remote service can be a privacy risk.
 
-## 📥 Download and Build APK
+We wanted to build something that could help with real daily tasks such as navigation, shopping, reading labels, and understanding surroundings—without making the user fight through a complicated interface. The goal was not just to make an AI demo. The goal was to make an assistant that a blind person could actually use.
 
-1. Download the project ZIP from [here](https://github.com/yugalkishor-agi/Blind-Vision-Assistant/archive/refs/heads/main.zip).
-2. Extract the downloaded ZIP file.
-3. Open a terminal inside the extracted project folder (the folder containing `pubspec.yaml`).
-4. Run the following commands:
+The app is offline-first: on a compatible phone, the model and vision processing run locally. Remote mode is included as a practical fallback for emulator demos and devices that cannot run the local model comfortably.
 
-   ```bash
-   flutter pub get
-   flutter build apk
-   ```
+## What the app does
 
-## Solution Approach
+Blind Vision Assistant helps users:
 
-Gemma 3n is a big step for on-device AI with vision. Running everything locally removes the need for internet and the privacy worry in one go.
+- Understand rooms, objects, people, colors, obstacles, and surroundings.
+- Read signs, labels, menus, prices, expiry dates, and other visible text.
+- Ask general knowledge and conversational questions without opening the camera.
+- Use voice dictation instead of typing.
+- Hear AI responses through streaming text-to-speech while the answer is being generated.
+- Control common actions with a Bluetooth keyboard/controller such as the 8BitDo Micro.
 
-I wanted this to be more than a demo. I wanted something people could actually use every day. As they say, the devil is in the details. Many accessibility apps don't fail because of weak technology. They fail because nobody thought them through for real situations. Convenience is everything: if an app isn't easy to use, it creates problems instead of solving them.
+The main vision workflow captures a single image when needed, processes it, and closes the camera immediately. The app does not keep a continuous camera preview running.
 
-The app works like a small agent that lives on the phone. Here is what happens when the user asks something:
+## The idea behind the experience
 
-1. The user presses a button on the controller (or taps the screen) and asks a question.
-2. The app quickly opens the camera, takes a photo and closes the camera again.
-3. If there is text in the picture, Google ML Kit reads it on the device.
-4. Gemma 3n gets the photo, the recognised text and the question, and works out the answer.
-5. The answer is spoken out loud while it is still being generated, and sounds tell the user what the app is doing.
+The app is designed around a simple interaction: ask a question, get useful guidance, and hear the answer without needing to look at the screen. A user can tap the large controls, dictate a question, or use a small Bluetooth controller. Audio cues communicate when dictation starts, when a message is sent, and when the assistant is still working.
 
-All of this happens on the phone, and each step uses whichever tool does that job best.
+This project was shaped by testing with my brother, who is completely blind with no light perception. His feedback made the difference between a feature that looked good in a demo and one that was genuinely usable. It pushed us to keep the experience on one screen, make controls explicit for TalkBack and VoiceOver, and treat latency and audio feedback as core product problems rather than small details.
 
-## Development Process
+## Agentic vision workflow
 
-I want to especially thank my brother for helping with testing and for appearing in the demo video. He is completely blind (no light perception), and working with him has been incredibly rewarding. His feedback showed me what actually makes an accessibility app useful.
+The app includes an agentic loop that chooses the right tool for each request instead of always sending every query through the camera.
 
-Challenges I faced:
+```text
+User question
+     │
+     ▼
+Text-only decision step
+     │
+     ├── final_answer  → answer from general knowledge, no camera
+     ├── ask_user      → ask the user to clarify
+     ├── run_ocr       → capture image → ML Kit OCR → grounded answer
+     ├── detect_scene  → capture image → Gemma vision → scene answer
+     └── analyze_both  → capture image → OCR + Gemma vision
+```
 
-- Downloading the model
-- Google AI Edge implementation
-- Improving inference speed
-- Positioning of the camera
-- Connecting a controller
-- Integration with TalkBack
-- Integration with VoiceOver (the app is built with Flutter, so it had to work on both)
-- Improving text recognition
+### How the decision is made
 
-## Downloading the Model
+1. The user's query is first sent to Gemma without an image.
+2. Gemma is asked to return a small JSON decision containing an allowed action and a reason.
+3. The app validates that action against a strict allowlist.
+4. The camera is opened only when the selected action requires an image.
+5. The selected tool runs with timeouts and limited retries.
+6. OCR output is treated as grounded text when available, reducing text hallucinations.
+7. The final answer is streamed to the UI and to the text-to-speech service.
 
-Putting a multi-gigabyte file inside the app was not possible, and hosting it myself would have meant bandwidth costs and ongoing maintenance. I ended up choosing HuggingFace to distribute the model. That brought its own problem: to download models with licenses, users usually have to create an account and generate an access token.
+If Gemma does not return valid JSON, the app retries with a stricter prompt and then uses a deterministic keyword-based fallback. This keeps the app useful even when the model does not follow the decision format perfectly.
 
-To fix this I copied the authentication flow used by the Google AI Edge Gallery app. It takes users through the license acceptance step by step, so they never have to find their way around HuggingFace or deal with access tokens. That matters a lot for non-technical users.
+The important design choice is that the agent does not capture an image for every question. A question such as “What is the capital of France?” can be answered without opening the camera. A question about a label or a scene gets the right visual tool. This reduces camera overhead, improves privacy, and makes the interaction feel much faster.
 
-I used the flutter\_downloader package so the download can run in the background, which I think was necessary given the size of the model. There is still one issue: on a poor internet connection the download sometimes fails, so for now I recommend users don't close the app while it downloads.
+## From camera experiments to the phone camera
 
-## Google AI Edge Implementation
+We considered putting an IP camera in a hat and also experimented with an ESP32-CAM. Both approaches created practical problems: battery life, camera quality, setup complexity, and unreliable access from the app. Most importantly, the images were not consistently good enough for reading text.
 
-For the AI itself I used Google AI Edge, through the flutter\_gemma package, which is built on Google's MediaPipe GenAI v0.10.24. It made running Gemma 3n on the device very straightforward, so I could spend my time on the accessibility side of the app.
+We chose the phone's camera because a phone powerful enough to run Gemma 3n usually has a much better camera, and it avoids extra hardware and pairing steps. The phone can be mounted in a chest harness so the user's hands remain available for a cane or controller. Since a blind user does not need a live preview, the app captures a quick snapshot and closes the camera before inference begins.
 
-Streaming responses turned out to be especially useful. Text-to-speech can start as soon as the first tokens appear, so the user doesn't wait for the whole answer. It also let me switch the backend accelerator to GPU, and I added that as a setting for people with a high-end GPU.
+That decision also solved a major performance bottleneck. Keeping the camera preview open made inference roughly ten times slower in our testing. Removing the continuous preview reduced a simple response from roughly 50 seconds to around 5 seconds on the tested setup.
 
-## Improving Inference Speed
+## The controller and accessibility details
 
-At first I wanted to keep the camera preview open the whole time the app was running. But the app was much slower than the Google AI Edge Gallery app running the same model on the same hardware. After a lot of digging, I found that having the camera open was the biggest bottleneck. It was slowing things down by about 10x.
+Touch is not always practical when a phone is mounted or when a user is walking. We therefore support a Bluetooth keyboard/controller such as the 8BitDo Micro. Its buttons can be configured as F1–F10, with each key mapped to a useful action: start or stop dictation, send text with a photo, send text only, ask “What is this?”, open settings, or activate the focused control.
 
-I also didn't want users to open another page just to take a photo. So now, when a message is sent, the app quickly starts the camera, takes the photo and closes the camera before inference begins. A simple "hey" prompt used to take 50 seconds to fully respond. Now it takes 5.
+We also designed the screen for users who do use a phone directly. Controls have large readable labels instead of relying only on icons, and TalkBack/VoiceOver receives explicit descriptions. When accessibility services interrupt TTS, the app tracks the spoken position and can retry the response instead of getting stuck in a speaking state.
 
-Removing the preview doesn't hurt the experience for blind users, who don't need it anyway.
+## Why OCR is a separate tool
 
-I then streamed the response so text-to-speech starts reading before the full answer is ready. This created a new problem. If the model generates text slower than the voice reads it, the voice stops once it catches up. A blind user can't tell whether the AI has finished or is still working on the next token. My fix was to play loading music in the background for as long as the AI is still generating.
+Reading printed text is one of the most important use cases, and visual-language models can hallucinate text even from a clear photo. Google ML Kit OCR runs locally and is usually much faster and more reliable for extracting text. The agent can route a request to OCR, then pass the grounded text to Gemma so the final answer is based on what was actually detected.
 
-## Positioning of the Camera
+## Core technology
 
-Where the camera sits is crucial for how well the app works and how easy it is to use. My requirements were:
+- **Framework:** Flutter / Dart
+- **On-device vision model:** Gemma 3n E2B IT Int4 through `flutter_gemma`
+- **OCR:** Google ML Kit Text Recognition
+- **Voice input:** `speech_to_text`
+- **Text-to-speech:** `flutter_tts`
+- **Camera:** Flutter Camera plugin
+- **Audio feedback:** `audioplayers`
+- **Model download:** `flutter_downloader`
+- **Model authentication:** Hugging Face OAuth with PKCE
+- **Local settings:** `shared_preferences`
+- **Optional remote backend:** OpenAI-compatible Gemma server through a Cloudflare Tunnel
 
-- Comfortable to use while walking
-- Good battery life
-- Works together with a cane
-- Easy to connect to the app
+## Project structure
 
-### First idea: an IP camera in a hat
+```text
+lib/
+├── main.dart                         App bootstrap and routing
+├── chat_page/
+│   ├── agent/                         Agent decisions and vision tools
+│   ├── config/                        Prompt templates
+│   ├── handlers/                      Keyboard/controller shortcuts
+│   ├── models/                        Chat message models
+│   ├── services/                      Gemma, OCR, speech, TTS, camera helpers
+│   └── widgets/                       Prompt bar, chat bubbles, accessible UI
+├── download_page/
+│   ├── logic/                         Model download coordinator
+│   ├── models/                        Download state and enums
+│   ├── services/                      OAuth, downloader, persistence, logging
+│   └── ui/                            Download screen widgets
+├── error_recovery_page.dart           Model failure recovery
+└── settings_page.dart                 Backend, prompt, and controller settings
+```
 
-My first idea was an IP camera in a hat. It would be discreet, and it would take pictures exactly where the person is looking. But it came with three problems: battery life, camera quality, and getting access to the camera from my app.
+## Running locally
 
-Most commercial IP cameras come with their own app, and the manufacturer wants you to use it, so they make it very hard to connect from anywhere else (a lot of the data is encrypted, for example). I managed to hack my way to the photos on the camera's SD card, but I could not make the camera take photos remotely without the manufacturer's app.
+### Requirements
 
-### Second idea: the ESP32-CAM
+- Flutter SDK
+- Android Studio or an Android device/emulator
+- A compatible device for practical on-device Gemma inference
 
-This went better. I programmed the ESP32-CAM to create its own WiFi network. The user connects to it, takes photos, and the app can easily get them. The problems were:
+### Setup
 
-- It needs a battery, and getting decent battery life made it very bulky.
-- I looked for hats with pockets to hold it, but they needed holes cut into them.
-- It would limit who could use the app. It became too technical for people to set up on their own, so anyone who wanted to try it would have to get all the gear from us.
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter run
+```
 
-The real deal breaker was camera quality. The final image wasn't even good enough to read text. I knew text recognition would be one of the main uses of the app, so it made no sense to spend more time on these cameras.
+The first on-device run may require downloading the Gemma model. The model is large, so keep the app open during the download and use a stable internet connection.
 
-### What we chose: the phone's camera
+## Emulator and remote model mode
 
-In the end we decided to use the phone's own camera. I figured that if a user's phone is powerful enough to run Gemma 3n at a good speed, its camera is almost certainly better than anything I could get from an IP camera. It also solved the battery and connection problems.
+The local Gemma model may not run reliably inside an emulator because of memory, hardware acceleration, and vision-inference limitations. The repository release includes a Kaggle notebook for remote testing.
 
-The last question was where to put the phone. The user could hold it, but from experience with apps like Seeing AI I knew that limits how useful the app is. Holding a phone is often impractical, especially for blind users, who usually need one hand for the cane. A chest harness seemed the best way to keep the phone in a good position with a clear view, and it's far more comfortable over long periods than a head harness. It isn't as discreet as a camera hidden in a hat, but that was a trade-off I was willing to make.
+1. Open the provided notebook in Kaggle.
+2. Add a Hugging Face token as a Kaggle Secret named `HF_TOKEN`.
+3. Run the notebook to start the Gemma-compatible model server.
+4. Start a Cloudflare Tunnel and copy its HTTPS URL.
+5. Install and open the APK.
+6. Open `Settings` and enable `Remote Model`.
+7. Paste the Cloudflare Tunnel URL and save.
 
-The problem is that a touchscreen is impractical to use once the phone is in a harness. We needed a new way to interact with it.
+The app will use the remote server for Gemma requests instead of the local model. This is mainly intended for emulator/demo testing.
 
-## The Controller
+> Never hardcode `HF_TOKEN` or any API key in the notebook or source code. Use Kaggle Secrets or another secure secret store.
 
-The goal for the controller was to make talking to the AI faster without needing a visual interface. VoiceOver is great, but it only focuses on one element at a time, so the same task takes far more clicks. A physical controller with buttons makes the interaction tactile. I think this should become a new standard for accessibility apps for the blind.
+> Remote mode sends prompts and captured images to the configured server. Use on-device mode when local processing and maximum privacy are required.
 
-I first tried a Bluetooth TikTok scroll ring, since it looked like the most compact option. It didn't work, because I couldn't intercept its HID signals before they reached the OS. So I switched to a Bluetooth keyboard, which was much easier to listen to for key events.
+## Accessibility and interaction
 
-The controller I chose is the 8BitDo Micro. It's small and, honestly, cute, and it can be programmed with the 8BitDo Ultimate Software so each key can be given any value. I used keyboard mode, which is the only mode that works on iOS, and set the keys to run from F1 to F10. That way they never get read as letters and never start typing in a text field. I picked F1 to F10 because F13 and above aren't registered on some Android phones.
+- Large text-based controls with explicit screen-reader labels.
+- Voice input button for dictation.
+- Streaming response speech for reduced waiting time.
+- Audio cues for dictation, sending, loading, and completion states.
+- Keyboard/controller shortcuts for users who cannot comfortably use the touchscreen.
+- A single-screen interaction model to reduce navigation effort.
 
-The app listens for raw keyboard events, and each function key triggers one action, such as:
+The controller can be configured to send function keys such as F1–F10. These actions can start dictation, send a prompt with a photo, send text only, trigger common vision questions, open settings, or activate the focused control.
 
-- Start or stop dictation
-- Send text with a photo
-- Send text only
-- Ask a common question like "What is this?"
+## Release assets
 
-## Integration with TalkBack and VoiceOver
+The GitHub release contains:
 
-I wanted the app to work without a controller too, for two reasons. It lets more people try it, and if they find it useful they can then buy the controller. And in some situations holding the phone is simply more practical than using the harness, which makes the controller inconvenient.
+- `app-debug.apk` — APK for testing.
+- `sourcecode.zip` — Clean source-code package.
+- Kaggle notebook — Remote Gemma setup for emulator testing.
 
-One issue with TalkBack was that it would say "button" without saying what the button was for. I tried Flutter tooltips, but it was much easier to replace the icons on the buttons with text that says exactly what each one does. That made the interface clearer, and TalkBack reads the button text perfectly. I also made the buttons very large and colourful, so someone who is partially sighted could use the screen directly.
+Download them from the [release page](https://github.com/yugalkishor-agi/Blind-Vision-Assistant/releases/tag/release).
 
-The 8BitDo Micro has arrow keys, so I also tried navigating the UI with TalkBack using the arrows and a button for Enter. At first this worked well on Android. On iOS, though, VoiceOver didn't treat Enter as a replacement for a double tap. I tried the shortcut Ctrl + Alt + Space to simulate a double tap (on Apple's side it's meant to be Ctrl + Option + Space), but it didn't work well. It behaved more like a long press: on the home screen it opened the edit home screen mode instead of launching an app. I don't know if the problem was how the controller sends the signal, or if Apple expects you to use an Apple keyboard with VoiceOver.
+## Privacy and limitations
 
-I wasn't happy trying to simulate a double tap on iOS, so I changed the code. Now the app listens for the Enter key and keeps track of which button is in focus, so when Enter arrives it activates that button directly.
+- On-device mode keeps images and inference on the device.
+- The on-device model requires several gigabytes of storage and suitable hardware.
+- Emulator performance may be insufficient for local vision inference.
+- Remote mode depends on the Kaggle server and Cloudflare Tunnel remaining available.
+- The app processes captured snapshots rather than a continuous live video stream.
+- Poor network conditions can interrupt the initial model download.
 
-That created the next problem: VoiceOver and TalkBack would speak over my text-to-speech plugin. On TalkBack this was serious. When TalkBack started speaking it interrupted my voice, and my text-to-speech never finished reading the response, so the app stayed stuck in the speaking state. To fix it, I added code that detects an interruption on the voice service and records how far it got in the sentence. It then waits 6 seconds (the average TalkBack interruption lasted about 5 seconds) and tries to resume. If the voice is still busy it waits another 6 seconds, up to a maximum of 5 retries.
+## Final thoughts
 
-## Improving Text Recognition
+This project came down to one idea: a blind user should be able to ask for help in a normal situation without depending on a complicated screen or handing every photo to a third party. The agentic loop, local OCR, snapshot-based camera flow, streaming speech, and controller support all serve that same goal.
 
-Reading text is one of the main uses of the app. Visually impaired people are very resourceful and can recognise many objects by touch, but that isn't possible with printed text.
+## Team
 
-In my testing with the 2B, 4-bit quantised model, Gemma's text recognition was questionable at best. It depended heavily on picture quality, and even with a clear photo it hallucinated often. That makes it unsuitable for real situations, where accuracy is vital.
+**Team VedX**
+Yugal Kishor and Harshvardhan Singh
 
-To solve this I added Google ML Kit text recognition. It runs completely on the device, usually in under a second, and it was far more accurate than Gemma. The text it finds is then passed to Gemma, which uses it to answer the user's question. This improved text reading massively, opened up many new use cases for Gemma, kept latency low, and kept everything on the device.
-
-## Making the App More Accessible
-
-Regular feedback from my brother helped me add many features that make the app easier to use. Unlike other accessibility apps, I kept everything on a single screen. That makes it much easier to ask a question or take another photo without going back through several screens.
-
-I also added lots of sound effects:
-
-- Loading music while the AI is generating a response
-- A chime when dictation starts
-- A different chime when dictation ends
-- A whoosh when a message is sent
-- A voice confirmation: "Sending text with photo" or "Sending text only"
-
-## Final Thoughts
-
-The whole project came down to one idea: make something a blind person can really use on a normal day, without internet and without handing their photos to anyone. Thank you to my brother for the testing, the patience and the honest feedback.
-
-Yugal Kishor and Harshvardhan singh, Team VedX | neatlogs Hackathon
+Built for the neatlogs Hackathon.
